@@ -1,0 +1,66 @@
+<html>
+	<head>
+		<link rel="stylesheet" href="css/jquery.mobile-1.0rc2.css" />
+		<link rel="stylesheet" href="css/styles.css" />
+		<script src="js/jquery.min.js"></script>
+		<script src="js/project.js"></script>
+		<meta name="viewport" content="width=default-width, initial-scale=1" />
+		
+		<script src="js/jquery.mobile-1.0rc2.js"></script>
+	</head>
+	
+	<body>
+		<div data-role="page" data-backbtn="false" data-cache="never" id="compPage">
+			<div data-role="header" data-position="inline">
+				<div class="topTitle compTitle"></div>
+				<a href="#" data-icon="arrow-l" class="jqm-home ui-btn-left ui-btn-corner-all ui-btn-down-f ui-btn-up-f backLink" title="back"  data-direction="reverse">Back</a>
+				
+				<a href="index.html" data-icon="home" class="jqm-home ui-btn-right ui-btn-corner-all ui-btn-down-f ui-btn-up-f" title="home">Home</a>
+			</div><!--  header -->
+
+			<div data-role="content">	
+				<div class="instructionText">Modify compression parameters.</div>
+				
+				<div>  <!-- Container around button options -->
+					<a href="#" id="enableDisable" data-role="button">Enable</a>
+					<div class="ui-grid-a"> <!-- LABELS! -->
+						<div class="ui-block-a"><div class="bandLabel">Ratio</div></div>
+						<div class="ui-block-b">
+							<input type="text" name="ratio" id="compRatio" value=""  />
+						</div>
+						
+						<div class="ui-block-a"><div class="bandLabel">Threshold</div></div>
+						<div class="ui-block-b">
+							<input type="text" name="threshold" id="compThreshold" value=""  />
+						</div>
+						
+						
+						<div class="ui-block-a"><div class="bandLabel">Attack</div></div>
+						<div class="ui-block-b">
+							<input type="text" name="attack" id="compAttack" value=""  />
+						</div>
+						
+						<div class="ui-block-a"><div class="bandLabel">Release</div></div>
+						<div class="ui-block-b">
+							<input type="text" name="release" id="compRelease" value=""  />
+						</div>
+						
+						
+						<div class="ui-block-a">
+							<div class="bandLabel">Gain</div>
+						</div>
+						<div class="ui-block-b">
+							<input type="text" name="gain" id="compGain" value=""  />
+						</div>
+					</div>
+					<a href="#" id="eqApply" data-role="button">Apply</a>
+				</div>
+			</div><!-- /content -->
+
+			<div data-role="footer">
+				<div class="footerText">A Senior Design G13 Project</h4>
+			</div><!-- /footer -->
+
+		</div><!-- /page -->
+	</body>
+</html>

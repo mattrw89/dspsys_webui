@@ -1,0 +1,36 @@
+<html>
+	<head>
+		<meta name="viewport" content="width=default-width, initial-scale=1" />
+		<link rel="stylesheet" href="css/jquery.mobile-1.0rc2.css" />
+		<link rel="stylesheet" href="css/styles.css" />
+		<script src="js/jquery.min.js"></script>
+		<script src="js/project.js"></script>
+
+		<script src="js/jquery.mobile-1.0rc2.js"></script>
+	</head>
+	<body>
+		<div data-role="page" data-cache="never" id="outputPage" data-backbtn="false">
+			<div data-role="header" data-position="inline">
+				<div class="topTitle" id="outputTitle"></div>
+				<a href="processoutputs.html" data-icon="arrow-l" class="jqm-home ui-btn-left ui-btn-corner-all ui-btn-down-f ui-btn-up-f" title="back" data-direction="reverse">Back</a>
+				<a href="index.html" data-icon="home" class="jqm-home ui-btn-right ui-btn-corner-all ui-btn-down-f ui-btn-up-f" title="home">Home</a>
+			</div><!--  header -->
+
+			<div data-role="content">	
+				<div class="instructionText">Select one.</div>
+				
+				<div>  <!-- Container around button options -->
+					<a href="eq.html?o=" id="eqLink" data-role="button">Equalization</a>
+					<a href="comp.html?o=" id="compLink" data-role="button">Compression</a>
+					<a href="lim.html?o=" id="limLink" data-role="button">NC-Limiting</a>
+				</div>
+			</div><!-- /content -->
+
+			<div data-role="footer">
+				<div class="footerText">A Senior Design G13 Project</h4>
+			</div><!-- /footer -->
+
+		</div><!-- /page -->
+	</body>
+</html>
+

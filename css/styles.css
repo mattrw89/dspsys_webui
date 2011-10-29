@@ -1,0 +1,33 @@
+.instructionText {
+	text-align:center; 
+	font-size:16px; 
+	font-family:'Helvetica Neue';
+	font-weight:bold;
+}
+
+.topTitle {
+	margin-top:8px;
+	margin-bottom:8px;
+	text-align:center;
+	font-size:15px;
+	font-family:'Helvetica Neue';
+}
+
+.footerText {
+	margin-top:8px;
+	margin-bottom:8px;
+	text-align:center;
+	font-size:14px;
+	font-family:'Helvetica Neue';
+}
+
+.bandLabel {
+	margin-top:14px;
+	margin-bottom:14px;
+	text-align:center;
+	font-size:18px;
+	font-family:'Helvetica Neue';	
+	font-weight:bold;
+}
+
+input[type='text'],input[type='number'],textarea,select {font-size:16px;}
