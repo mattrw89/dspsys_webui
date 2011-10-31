@@ -27,46 +27,46 @@ $.urlParam = function(name){
 /////////////////////////////////////////////////////////
 /////////////  PAGE SPECIFIC INITIALIZERS ///////////////
 
-///// Process Inputs -- processinputs.html ////////////
+///// Process Inputs -- proci.htm ////////////
 $('#processInputsPage').live('pagebeforecreate', function(e) {
 	var inputNames = loadActiveInputNames();
 	var i = 0;
 	
 	for(i=0; i < inputNames.length; i++) {
-		$('#fillInputButtons').append("<a href='input.html?i=" + (i+1) + "' data-role='button'>" + inputNames[i] + "</a>");
+		$('#fillInputButtons').append("<a href='input.htm?i=" + (i+1) + "' data-role='button'>" + inputNames[i] + "</a>");
 	}
 });
 
-///// Process Outputs -- processoutputs.html ///////////
+///// Process Outputs -- proco.htm ///////////
 $('#processOutputsPage').live('pagebeforecreate', function(e) {
 	var outputNames = loadOutputNameArray();
 	var j = 0;
 	
 	for(j=0; j < outputNames.length; j++) {
-		$('#fillOutputButtons').append("<a href='output.html?o=" + (j+1) + "' data-role='button'>" + outputNames[j] + "</a>");
+		$('#fillOutputButtons').append("<a href='output.htm?o=" + (j+1) + "' data-role='button'>" + outputNames[j] + "</a>");
 	}
 });
 
-//////Input Processing Selection -- input.html /////////////
+//////Input Processing Selection -- input.htm /////////////
 $('#inputPage').live('pagebeforeshow', function (event, ui) {
 	inum = $.urlParam('i');
 
 	$('#inputTitle').text('Input ' + getActiveInputName(inum));
-	$('#eqLink').attr('href','eq.html?i=' + inum)
-	$('#compLink').attr('href','comp.html?i=' + inum)
-	$('#limLink').attr('href','lim.html?i=' + inum)
+	$('#eqLink').attr('href','eq.htm?i=' + inum)
+	$('#compLink').attr('href','comp.htm?i=' + inum)
+	$('#limLink').attr('href','lim.htm?i=' + inum)
 });
 
-////////Output Processing Selection -- output.html ///////////////
+////////Output Processing Selection -- output.htm ///////////////
 $('#outputPage').live('pagebeforeshow', function (event, ui) {
 	onum = $.urlParam('o');
 	$('#outputTitle').text('Output ' + getOutputName(onum));
-	$('#eqLink').attr('href','eq.html?o=' + onum)
-	$('#compLink').attr('href','comp.html?o=' + onum)
-	$('#limLink').attr('href','lim.html?o=' + onum)
+	$('#eqLink').attr('href','eq.htm?o=' + onum)
+	$('#compLink').attr('href','comp.htm?o=' + onum)
+	$('#limLink').attr('href','lim.htm?o=' + onum)
 });
 
-//////  EQ Settings Page -- eq.html ////////////
+//////  EQ Settings Page -- eq.htm ////////////
 $("#eqPage").live('pagebeforeshow',function(event) {
 	enable = null; // reset the enable/disable status
 	setEnableDisableButton();
@@ -74,15 +74,15 @@ $("#eqPage").live('pagebeforeshow',function(event) {
 	onum = $.urlParam('o');
 	if( inum == 0 ) {
 		$('.eqTitle').text('EQ Output ' + getOutputName(onum));
-		$('.backLink').attr('href','output.html?o=' + onum);
+		$('.backLink').attr('href','output.htm?o=' + onum);
 	}
 	if( inum != 0) {
 		$('.eqTitle').text('EQ Input ' + getActiveInputName(inum));
-		$('.backLink').attr('href','input.html?i=' + inum);
+		$('.backLink').attr('href','input.htm?i=' + inum);
 	}
 });
 
-//event listener for Apply button on eq.html
+//event listener for Apply button on eq.htm
 $('#eqApply').live('click',function(e) {
 	e.stopImmediatePropagation();
 	e.preventDefault();
@@ -91,7 +91,7 @@ $('#eqApply').live('click',function(e) {
 	return false;
 });
 
-///// Compressor Settings Page -- comp.html ///////////
+///// Compressor Settings Page -- comp.htm ///////////
 $("#compPage").live('pagebeforeshow',function(event) {
 	enable = null; // reset the enable/disable status
 	setEnableDisableButton();
@@ -100,11 +100,11 @@ $("#compPage").live('pagebeforeshow',function(event) {
 
 	if( inum == 0 ) {
 		$('.compTitle').text('Comp Output ' + getOutputName(onum));
-		$('.backLink').attr('href','output.html?o=' + onum);
+		$('.backLink').attr('href','output.htm?o=' + onum);
 	}
 	if( inum != 0) {
 		$('.compTitle').text('Comp Input ' + getActiveInputName(inum));
-		$('.backLink').attr('href','input.html?i=' + inum);
+		$('.backLink').attr('href','input.htm?i=' + inum);
 	}
 	
 	var values = loadCompSettings();
@@ -115,7 +115,7 @@ $("#compPage").live('pagebeforeshow',function(event) {
 	$('#compGain').val(values['gain']);
 });
 
-/////// Matrix Routing Page -- matrix.html /////////////
+/////// Matrix Routing Page -- matrix.htm /////////////
 $('#matrixPage').live('pagebeforecreate', function(event,ui) {
 	var matrixRoutes = loadMatrixRoutes();
 	var selected = "";
@@ -132,7 +132,7 @@ $('#matrixPage').live('pagebeforecreate', function(event,ui) {
 	}
 });
 
-//An event listener for the Apply button on matrix.html
+//An event listener for the Apply button on matrix.htm
 $('#matrixApply').live('click',function(e) {
 	e.stopImmediatePropagation();
 	e.preventDefault();
@@ -141,7 +141,7 @@ $('#matrixApply').live('click',function(e) {
 	return false;
 });
 
-///////// Label Inputs Page -- labeli.html ///////////////////
+///////// Label Inputs Page -- labeli.htm ///////////////////
 $('#labelInputsPage').live('pagebeforecreate', function(event,ui) {
 	var names = loadInputNameArray();
 	changeTopTitle('Label Inputs');
@@ -151,7 +151,7 @@ $('#labelInputsPage').live('pagebeforecreate', function(event,ui) {
 	}
 });
 
-/////////// Label Outputs Page -- labelo.html ////////////////
+/////////// Label Outputs Page -- labelo.htm ////////////////
 $('#labelOutputsPage').live('pagebeforecreate', function(event,ui) {
 	var names = loadOutputNameArray();
 	changeTopTitle('Label Outputs');
@@ -161,7 +161,7 @@ $('#labelOutputsPage').live('pagebeforecreate', function(event,ui) {
 	}
 });
 
-/////////// Label Breakout Box Page -- labelb.html ///////////
+/////////// Label Breakout Box Page -- labelb.htm ///////////
 $('#labelBoxPage').live('pagebeforecreate', function(event,ui) {
 	var names = getBreakoutBoxNames();
 	changeTopTitle('Label Boxes');
@@ -171,7 +171,7 @@ $('#labelBoxPage').live('pagebeforecreate', function(event,ui) {
 	}
 });
 
-/////////// Check Clip Status -- checkstatus.html ///////////////////
+/////////// Check Clip Status -- chkstat.htm ///////////////////
 $('#checkStatusPage').live('pagebeforecreate', function(event,ui) {
 	var activeInputStatus = loadActiveInputStatus();
 	var activeInputNames = loadActiveInputNames();
@@ -199,7 +199,7 @@ $('#checkStatusPage').live('pagebeforecreate', function(event,ui) {
 	}
 });
 
-///////////  Check Breakout Box Status -- breakoutboxstatus.html //////////////////
+///////////  Check Breakout Box Status -- bobstat.htm //////////////////
 $('#checkBOStatusPage').live('pagebeforecreate', function(event,ui) {
 	breakoutBoxNames = getBreakoutBoxNames();
 	channelNames = loadOutputNameArray();
@@ -218,7 +218,7 @@ $('#checkBOStatusPage').live('pagebeforecreate', function(event,ui) {
 		$('#fillBreakOutStatus').append("</div>");
 	}
 });
-////// GENERAL Event Listener for Enable/Disable on eq.html & comp.html
+////// GENERAL Event Listener for Enable/Disable on eq.htm & comp.htm
 $('#enableDisable').live('click',function(e) {
 	e.stopImmediatePropagation();
 	e.preventDefault();
