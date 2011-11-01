@@ -3,8 +3,8 @@ var numOutputs = 8;
 var numInputs = 8;
 
 //initialize a few vars
-var inum=0;
-var onum=0;
+var currentIO = null;  // 0=input, 1=output
+var currentChannel = 0;
 var enable=null;
 
 //Disable domCache & optionally disable AJAX
@@ -15,15 +15,6 @@ $(document).bind("mobileinit", function(){
 $.mobile.page.prototype.options.domCache = false;
 }); 
 
-//create a function to grab query parameters from the URL
-$.urlParam = function(name){
-  var results = new RegExp('[\\?&]' + name + '=([^&#]*)').exec(window.location.href);
-  if (!results) { 
-    return 0; 
-  }
-  return results[1] || 0;
-}
-
 /////////////////////////////////////////////////////////
 /////////////  PAGE SPECIFIC INITIALIZERS ///////////////
 
@@ -31,55 +22,92 @@ $.urlParam = function(name){
 $('#processInputsPage').live('pagebeforecreate', function(e) {
 	var inputNames = loadActiveInputNames();
 	var i = 0;
+	changeTopTitle('Process Inputs');
 	
 	for(i=0; i < inputNames.length; i++) {
-		$('#fillInputButtons').append("<a href='input.htm?i=" + (i+1) + "' data-role='button'>" + inputNames[i] + "</a>");
+		//$('#fillInputButtons').append("<a href='input.htm?i=" + (i+1) + "' data-role='button'>" + inputNames[i] + "</a>");
+		$('#fillInputButtons').append("<a href='#' data-role='button' class='input' channel='" + (i+1) + "'>" + inputNames[i] + "</a>");
 	}
+});
+
+$('.input').live('click',function(e) {
+	e.stopImmediatePropagation();
+	e.preventDefault();
+	setCurrentChannelAndIO($(this).attr('channel'), 0);
+	$.mobile.changePage("input.htm");
+	return false;
 });
 
 ///// Process Outputs -- proco.htm ///////////
 $('#processOutputsPage').live('pagebeforecreate', function(e) {
 	var outputNames = loadOutputNameArray();
 	var j = 0;
+	changeTopTitle('Process Inputs');
 	
 	for(j=0; j < outputNames.length; j++) {
-		$('#fillOutputButtons').append("<a href='output.htm?o=" + (j+1) + "' data-role='button'>" + outputNames[j] + "</a>");
+	//	$('#fillOutputButtons').append("<a href='output.htm?o=" + (j+1) + "' data-role='button'>" + outputNames[j] + "</a>");
+		$('#fillOutputButtons').append("<a href='#' data-role='button' class='output' channel='" + (j+1) + "'>" + outputNames[j] + "</a>");
 	}
+});
+
+$('.output').live('click',function(e) {
+	e.stopImmediatePropagation();
+	e.preventDefault();
+	setCurrentChannelAndIO($(this).attr('channel'), 1)
+	$.mobile.changePage("output.htm");
+	return false;
 });
 
 //////Input Processing Selection -- input.htm /////////////
 $('#inputPage').live('pagebeforeshow', function (event, ui) {
-	inum = $.urlParam('i');
-
-	$('#inputTitle').text('Input ' + getActiveInputName(inum));
-	$('#eqLink').attr('href','eq.htm?i=' + inum)
-	$('#compLink').attr('href','comp.htm?i=' + inum)
-	$('#limLink').attr('href','lim.htm?i=' + inum)
+	$('#inputTitle').text('Input ' + getActiveInputName(getCurrentChannel()));
 });
 
 ////////Output Processing Selection -- output.htm ///////////////
 $('#outputPage').live('pagebeforeshow', function (event, ui) {
-	onum = $.urlParam('o');
-	$('#outputTitle').text('Output ' + getOutputName(onum));
-	$('#eqLink').attr('href','eq.htm?o=' + onum)
-	$('#compLink').attr('href','comp.htm?o=' + onum)
-	$('#limLink').attr('href','lim.htm?o=' + onum)
+	$('#outputTitle').text('Output ' + getOutputName(getCurrentChannel()));
+});
+
+$('.procType').live('click',function(e) {
+	e.stopImmediatePropagation();
+	e.preventDefault();
+
+	var procType = $(this).attr('function');
+	var page = "";
+	if (procType == "eq") {
+		page="eq.htm";
+	} else if (procType == "comp") {
+		page="comp.htm";
+	} else if (procType == "lim") {
+		page="lim.htm";
+	}
+
+	$.mobile.changePage(page);
+	return false;
 });
 
 //////  EQ Settings Page -- eq.htm ////////////
 $("#eqPage").live('pagebeforeshow',function(event) {
 	enable = null; // reset the enable/disable status
 	setEnableDisableButton();
-	inum = $.urlParam('i');
-	onum = $.urlParam('o');
-	if( inum == 0 ) {
-		$('.eqTitle').text('EQ Output ' + getOutputName(onum));
-		$('.backLink').attr('href','output.htm?o=' + onum);
+
+	if( getCurrentIO() == 1) {
+		$('.eqTitle').text('EQ Output ' + getOutputName(getCurrentChannel()));
+	} else if (getCurrentIO() == 0){
+		$('.eqTitle').text('EQ Input ' + getActiveInputName(getCurrentChannel()));
+	} else $('.eqTitle').text('None');
+});
+
+$('.backLinkFuncs').live('click',function(e) {
+	e.stopImmediatePropagation();
+	e.preventDefault();
+	
+	if(getCurrentIO() == 1) {
+		$.mobile.changePage("output.htm", {reverse: true});		
+	} else {
+		$.mobile.changePage("input.htm", {reverse: true});
 	}
-	if( inum != 0) {
-		$('.eqTitle').text('EQ Input ' + getActiveInputName(inum));
-		$('.backLink').attr('href','input.htm?i=' + inum);
-	}
+	return false;
 });
 
 //event listener for Apply button on eq.htm
@@ -95,17 +123,12 @@ $('#eqApply').live('click',function(e) {
 $("#compPage").live('pagebeforeshow',function(event) {
 	enable = null; // reset the enable/disable status
 	setEnableDisableButton();
-	inum = $.urlParam('i');
-	onum = $.urlParam('o');
-
-	if( inum == 0 ) {
-		$('.compTitle').text('Comp Output ' + getOutputName(onum));
-		$('.backLink').attr('href','output.htm?o=' + onum);
-	}
-	if( inum != 0) {
-		$('.compTitle').text('Comp Input ' + getActiveInputName(inum));
-		$('.backLink').attr('href','input.htm?i=' + inum);
-	}
+	
+	if( getCurrentIO() == 1 ) {
+		$('.compTitle').text('Comp Output ' + getOutputName(getCurrentChannel()));
+	} else if (getCurrentIO() == 0) {
+		$('.compTitle').text('Comp Input ' + getActiveInputName(getCurrentChannel()));
+	} else $('.compTitle').text('None');
 	
 	var values = loadCompSettings();
 	$('#compRatio').val(values['ratio']);
@@ -215,7 +238,6 @@ $('#checkBOStatusPage').live('pagebeforecreate', function(event,ui) {
 		$('#fillBreakOutStatus').append("<div class='ui-block-a' style='text-align:center'>" + breakoutBoxNames[i]+ "</div>");
 		$('#fillBreakOutStatus').append("<div class='ui-block-b' style='text-align:center'>" + textAmpStatus+ "</div>");
 		$('#fillBreakOutStatus').append("<div class='ui-block-c' style='text-align:center'>" + channelNames[i]+ "</div>");
-		$('#fillBreakOutStatus').append("</div>");
 	}
 });
 ////// GENERAL Event Listener for Enable/Disable on eq.htm & comp.htm
@@ -269,12 +291,12 @@ function loadActiveInputNames() {
 	return activeInputNames;
 }
 
-function getOutputName(onum) {
-	return loadOutputNameArray()[onum-1];
+function getOutputName(o) {
+	return loadOutputNameArray()[o-1];
 }
 
-function getActiveInputName(inum) {
-	return loadActiveInputNames()[inum-1];
+function getActiveInputName(i) {
+	return loadActiveInputNames()[i-1];
 }
 
 function changeTopTitle(text) {
@@ -282,6 +304,29 @@ function changeTopTitle(text) {
 	return false;
 }
 
+function getCurrentChannel() {
+	if((currentChannel > 0) && (currentChannel != null)) {
+		return currentChannel;
+	} else if(($.cookie("channel") > 0) && ($.cookie("channel") != null)) {
+		return $.cookie("channel");
+	} else return 99;
+}
+
+function getCurrentIO() {
+	if (currentIO != null) {
+		return currentIO;
+	} else if($.cookie("io") != null) {
+		return $.cookie("io");
+	} else return 99;
+}
+
+function setCurrentChannelAndIO(channel,io) {
+	currentChannel= channel;
+	currentIO = io;
+	$.cookie("io",io);
+	$.cookie("channel",channel);
+	return true;
+}
 /////////////  Functions using or creating "SPOOFED" data ////////////////
 function getBreakoutBoxStatus(){
 	return [0, 1, 0, 0, 0];  // 0=OK, 1=UH OH. 
@@ -337,3 +382,47 @@ function loadCompSettings() {
 	compSettings = {"ratio":2.0, "threshold":10, "attack":20, "release":20, "gain":0.0}
 	return compSettings;
 }
+
+
+
+/**
+ * jQuery Cookie plugin
+ *
+ * Copyright (c) 2010 Klaus Hartl (stilbuero.de)
+ * Dual licensed under the MIT and GPL licenses:
+ * http://www.opensource.org/licenses/mit-license.php
+ * http://www.gnu.org/licenses/gpl.html
+ *
+ */
+jQuery.cookie = function (key, value, options) {
+
+    // key and at least value given, set cookie...
+    if (arguments.length > 1 && String(value) !== "[object Object]") {
+        options = jQuery.extend({}, options);
+
+        if (value === null || value === undefined) {
+            options.expires = -1;
+        }
+
+        if (typeof options.expires === 'number') {
+            var days = options.expires, t = options.expires = new Date();
+            t.setDate(t.getDate() + days);
+        }
+
+        value = String(value);
+
+        return (document.cookie = [
+            encodeURIComponent(key), '=',
+            options.raw ? value : encodeURIComponent(value),
+            options.expires ? '; expires=' + options.expires.toUTCString() : '', // use expires attribute, max-age is not supported by IE
+            options.path ? '; path=' + options.path : '',
+            options.domain ? '; domain=' + options.domain : '',
+            options.secure ? '; secure' : ''
+        ].join(''));
+    }
+
+    // key and possibly options given, get cookie...
+    options = value || {};
+    var result, decode = options.raw ? function (s) { return s; } : decodeURIComponent;
+    return (result = new RegExp('(?:^|; )' + encodeURIComponent(key) + '=([^;]*)').exec(document.cookie)) ? decode(result[1]) : null;
+};
