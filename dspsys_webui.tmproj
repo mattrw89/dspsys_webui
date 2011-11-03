@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>currentDocument</key>
-	<string>css/jquery.css</string>
+	<string>js/project.js</string>
 	<key>documents</key>
 	<array>
 		<dict>
@@ -63,20 +63,6 @@
 			<key>firstVisibleLine</key>
 			<integer>0</integer>
 		</dict>
-		<key>css/jquery.css</key>
-		<dict>
-			<key>caret</key>
-			<dict>
-				<key>column</key>
-				<integer>4</integer>
-				<key>line</key>
-				<integer>1291</integer>
-			</dict>
-			<key>firstVisibleColumn</key>
-			<integer>0</integer>
-			<key>firstVisibleLine</key>
-			<integer>1288</integer>
-		</dict>
 		<key>css/styles.css</key>
 		<dict>
 			<key>caret</key>
@@ -96,23 +82,23 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>38</integer>
+				<integer>13</integer>
 				<key>line</key>
-				<integer>4</integer>
+				<integer>52</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>0</integer>
+			<integer>28</integer>
 		</dict>
 		<key>index.htm</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>2</integer>
+				<integer>27</integer>
 				<key>line</key>
-				<integer>7</integer>
+				<integer>4</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
@@ -124,35 +110,7 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>38</integer>
-				<key>line</key>
-				<integer>5</integer>
-			</dict>
-			<key>firstVisibleColumn</key>
-			<integer>0</integer>
-			<key>firstVisibleLine</key>
-			<integer>0</integer>
-		</dict>
-		<key>js/jqmrc2.js</key>
-		<dict>
-			<key>caret</key>
-			<dict>
-				<key>column</key>
-				<integer>0</integer>
-				<key>line</key>
-				<integer>0</integer>
-			</dict>
-			<key>firstVisibleColumn</key>
-			<integer>0</integer>
-			<key>firstVisibleLine</key>
-			<integer>0</integer>
-		</dict>
-		<key>js/jquery.js</key>
-		<dict>
-			<key>caret</key>
-			<dict>
-				<key>column</key>
-				<integer>0</integer>
+				<integer>6</integer>
 				<key>line</key>
 				<integer>0</integer>
 			</dict>
@@ -166,14 +124,14 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>0</integer>
+				<integer>37</integer>
 				<key>line</key>
-				<integer>428</integer>
+				<integer>246</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>0</integer>
+			<integer>273</integer>
 		</dict>
 		<key>labelb.htm</key>
 		<dict>
@@ -291,10 +249,8 @@
 	<key>openDocuments</key>
 	<array>
 		<string>js/project.js</string>
-		<string>js/jquery.js</string>
 		<string>bobstat.htm</string>
 		<string>chkstat.htm</string>
-		<string>css/jquery.css</string>
 		<string>labelb.htm</string>
 		<string>index.htm</string>
 		<string>output.htm</string>
@@ -308,7 +264,6 @@
 		<string>proci.htm</string>
 		<string>proco.htm</string>
 		<string>css/styles.css</string>
-		<string>js/jqmrc2.js</string>
 	</array>
 	<key>showFileHierarchyDrawer</key>
 	<false/>
@@ -340,6 +295,6 @@
 		</dict>
 	</dict>
 	<key>windowFrame</key>
-	<string>{{560, 4}, {1120, 1024}}</string>
+	<string>{{0, 4}, {1680, 1024}}</string>
 </dict>
 </plist>

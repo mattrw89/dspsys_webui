@@ -30,89 +30,93 @@
 						<div class="ui-block-d"><div class="bandLabel">Freq</div></div>
 						<div class="ui-block-e"><div class="bandLabel">Gain</div></div>
 
+						<div band="1">
+							<div class="ui-block-a"><div class="bandLabel">1</div></div>
+							<div class="ui-block-b">
+								<label for="t1" class="select ui-hidden-accessible">Band 1 Type</label>
+						  	<select name="t1" id="type1">
+						      <option value="0">HPF</option>
+						      <option value="1">Bump</option>
+						      <option value="2">LPF</option>
+						   	</select>
+							</div>
+							<div class="ui-block-c">
+								<label for="1q" class="ui-hidden-accessible">Band 1 Q</label>
+								<input type="text" name="1q" class="q" value="2.0"  /></div>
+							<div class="ui-block-d">
+								<label for="1f" class="ui-hidden-accessible">Band 1 Freq</label>
+								<input type="text" name="1f" class="freq" value="100"  />
+							</div>
+							<div class="ui-block-e">
+								<label for="1g" class="ui-hidden-accessible">Band 1 Gain</label>
+								<input type="text" name="1g" class="gain" value="0.0" />
+							</div>
+						</div>
 
-						<div class="ui-block-a"><div class="bandLabel">1</div></div>
-						<div class="ui-block-b">
-							<label for="t1" class="select ui-hidden-accessible">Band 1 Type</label>
-					  	<select name="t1" id="t1">
-					      <option value="HPF">HPF</option>
-					      <option value="Bump">Bump</option>
-					      <option value="LPF">LPF</option>
-					   	</select>
-						</div>
-						<div class="ui-block-c">
-							<label for="1q" class="ui-hidden-accessible">Band 1 Q</label>
-							<input type="text" name="1q" id="1q" value="2.0"  /></div>
-						<div class="ui-block-d">
-							<label for="1f" class="ui-hidden-accessible">Band 1 Freq</label>
-							<input type="text" name="1f" id="1f" value="100"  />
-						</div>
-						<div class="ui-block-e">
-							<label for="1g" class="ui-hidden-accessible">Band 1 Gain</label>
-							<input type="text" name="1g" id="1g" value="0.0"  />
-						</div>
-
-
-						<div class="ui-block-a"><div class="bandLabel">2</div></div>
-						<div class="ui-block-b">
-							<label for="2t" class="ui-hidden-accessible">Band 2 Type</label>
-							<div class="bandLabel">Bump</div>
-						</div>
-						<div class="ui-block-c">
-							<label for="2q" class="ui-hidden-accessible">Band 2 Q</label>
-							<input type="text" name="2q" id="2q" value="2.0"  />
-						</div>
-						<div class="ui-block-d">
-							<label for="2f" class="ui-hidden-accessible">Band 2 Freq</label>
-							<input type="text" name="2f" id="2f" value="500"  />
-						</div>
-						<div class="ui-block-e">
-							<label for="2g" class="ui-hidden-accessible">Band 2 Gain</label>
-							<input type="text" name="2g" id="2g" value="0.0"  />
+						<div band="2">
+							<div class="ui-block-a"><div class="bandLabel">2</div></div>
+							<div class="ui-block-b">
+								<label for="2t" class="ui-hidden-accessible">Band 2 Type</label>
+								<div class="bandLabel">Bump</div>
+							</div>
+							<div class="ui-block-c">
+								<label for="2q" class="ui-hidden-accessible">Band 2 Q</label>
+								<input type="text" name="2q" class="q" value="2.0"  />
+							</div>
+							<div class="ui-block-d">
+								<label for="2f" class="ui-hidden-accessible">Band 2 Freq</label>
+								<input type="text" name="2f" class="freq" value="500"  />
+							</div>
+							<div class="ui-block-e">
+								<label for="2g" class="ui-hidden-accessible">Band 2 Gain</label>
+								<input type="text" name="2g" class="gain" value="0.0"  />
+							</div>
 						</div>
 						
+						<div band="3">
+							<div class="ui-block-a"><div class="bandLabel">3</div></div>
+							<div class="ui-block-b">
+								<label for="3t" class="ui-hidden-accessible">Band 3 Type</label>
+								<div class="bandLabel" style="vertical-align:middle">Bump</div>
+							</div>
+							<div class="ui-block-c">
+								<label for="3q" class="ui-hidden-accessible">Band 3 Q</label>
+								<input type="text" name="3q" class="q" value="2.0"  />
+							</div>
+							<div class="ui-block-d">	
+								<label for="3f" class="ui-hidden-accessible">Band 3 Freq</label>
+								<input type="text" name="3f" class="freq" value="2000"  />
+							</div>
+							<div class="ui-block-e">
+								<label for="3g" class="ui-hidden-accessible">Band 3 Gain</label>
+								<input type="text" name="3g" class="gain" value="0.0"  />
+							</div>
+						</div>
 						
-						<div class="ui-block-a"><div class="bandLabel">3</div></div>
-						<div class="ui-block-b">
-							<label for="3t" class="ui-hidden-accessible">Band 3 Type</label>
-							<div class="bandLabel" style="vertical-align:middle">Bump</div>
-						</div>
-						<div class="ui-block-c">
-							<label for="3q" class="ui-hidden-accessible">Band 3 Q</label>
-							<input type="text" name="3q" id="3q" value="2.0"  />
-						</div>
-						<div class="ui-block-d">	
-							<label for="3f" class="ui-hidden-accessible">Band 3 Freq</label>
-							<input type="text" name="3f" id="3f" value="2000"  />
-						</div>
-						<div class="ui-block-e">
-							<label for="3g" class="ui-hidden-accessible">Band 3 Gain</label>
-							<input type="text" name="3g" id="3g" value="0.0"  />
-						</div>
-						
-						
-						<div class="ui-block-a">
-							<div class="bandLabel">4</div>
-						</div>
-						<div class="ui-block-b">
-							<label for="t4" class="select ui-hidden-accessible">Band 4 Type</label>
-						  <select name="t4" id="t4">
-						    <option value="HPF">HPF</option>
-						    <option value="Bump">Bump</option>
-						    <option value="LPF">LPF</option>
-						   </select>
-						</div>
-						<div class="ui-block-c">
-							<label for="4q" class="ui-hidden-accessible">Band 4 Q</label>
-							<input type="text" name="4q" id="4q" value="2.0"  />
-						</div>
-						<div class="ui-block-d">
-							<label for="4f" class="ui-hidden-accessible">Band 4 Freq</label>
-							<input type="text" name="4f" id="4f" value="10000"  />
-						</div>
-						<div class="ui-block-e">
-							<label for="4g" class="ui-hidden-accessible">Band 4 Gain</label>
-							<input type="text" name="4g" id="4g" value="0.0"  />
+						<div band="4">
+							<div class="ui-block-a">
+								<div class="bandLabel">4</div>
+							</div>
+							<div class="ui-block-b">
+								<label for="t4" class="select ui-hidden-accessible">Band 4 Type</label>
+							  <select name="t4" id="type4">
+							    <option value="0">HPF</option>
+							    <option value="1">Bump</option>
+							    <option value="2">LPF</option>
+							   </select>
+							</div>
+							<div class="ui-block-c">
+								<label for="4q" class="ui-hidden-accessible">Band 4 Q</label>
+								<input type="text" name="4q" class="q" value="2.0"  />
+							</div>
+							<div class="ui-block-d">
+								<label for="4f" class="ui-hidden-accessible">Band 4 Freq</label>
+								<input type="text" name="4f" class="freq" value="10000"  />
+							</div>
+							<div class="ui-block-e">
+								<label for="4g" class="ui-hidden-accessible">Band 4 Gain</label>
+								<input type="text" name="4g" class="gain" value="0.0"  />
+							</div>
 						</div>
 					</div>
 					<a href="#" id="eqApply" data-role="button">Apply</a>
