@@ -54,14 +54,14 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>38</integer>
+				<integer>25</integer>
 				<key>line</key>
-				<integer>4</integer>
+				<integer>55</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>0</integer>
+			<integer>12</integer>
 		</dict>
 		<key>css/styles.css</key>
 		<dict>
@@ -82,14 +82,14 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>13</integer>
+				<integer>36</integer>
 				<key>line</key>
-				<integer>52</integer>
+				<integer>101</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>28</integer>
+			<integer>76</integer>
 		</dict>
 		<key>index.htm</key>
 		<dict>
@@ -124,14 +124,14 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>37</integer>
+				<integer>8</integer>
 				<key>line</key>
-				<integer>246</integer>
+				<integer>463</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>273</integer>
+			<integer>455</integer>
 		</dict>
 		<key>labelb.htm</key>
 		<dict>
@@ -152,9 +152,9 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>24</integer>
+				<integer>37</integer>
 				<key>line</key>
-				<integer>6</integer>
+				<integer>7</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
@@ -168,7 +168,7 @@
 				<key>column</key>
 				<integer>24</integer>
 				<key>line</key>
-				<integer>6</integer>
+				<integer>24</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
@@ -249,14 +249,14 @@
 	<key>openDocuments</key>
 	<array>
 		<string>js/project.js</string>
+		<string>eq.htm</string>
 		<string>bobstat.htm</string>
+		<string>input.htm</string>
 		<string>chkstat.htm</string>
 		<string>labelb.htm</string>
 		<string>index.htm</string>
 		<string>output.htm</string>
 		<string>comp.htm</string>
-		<string>input.htm</string>
-		<string>eq.htm</string>
 		<string>labeli.htm</string>
 		<string>labelio.htm</string>
 		<string>labelo.htm</string>
@@ -295,6 +295,6 @@
 		</dict>
 	</dict>
 	<key>windowFrame</key>
-	<string>{{0, 4}, {1680, 1024}}</string>
+	<string>{{560, 4}, {1120, 1024}}</string>
 </dict>
 </plist>
