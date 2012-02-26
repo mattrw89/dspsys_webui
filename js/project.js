@@ -100,7 +100,18 @@ $("#eqPage").live('pagebeforeshow',function(event) {
 	} else $.mobile.changePage('index.htm', {reverse: true});
 	
 	////Put specs from API into page
-	updateEQSettings();
+	//fire off XHR request with callback for updateEQSettings
+	var io = getCurrentIO() ? "o" : "i";
+	var request = $.ajax({
+		type: 'GET',
+		url: "a/" + io + "/" + getCurrentChannel() + "/eqparams.json",
+  	dataType: 'json',
+		cache: false,
+		success: function(data){ alert('success'); },
+		error: function(data) {alert('error')},
+		complete: function(data){alert('complete'); updateEQSettings(data)}
+	});
+	
 });
 
 $('.backLinkFuncs').live('click',function(e) {
@@ -123,7 +134,6 @@ $('#eqApply').live('click',function(e) {
 	api_writeEQSettings();
 	
 	//run some function to update the values in the MCU
-	alert('updating...');
 	return false;
 });
 
@@ -346,8 +356,8 @@ function setCurrentChannelAndIO(channel,io) {
 	return true;
 }
 
-function updateEQSettings() {
-	var eqSettings = loadEQSettings();
+function updateEQSettings(eqSettings) {
+	eqSettings = $.parseJSON(eqSettings['responseText']);
 	for (i=0; i<4; i++) {
 		if ((eqSettings[i]['bandNum'] == 1) || (eqSettings[i]['bandNum'] == 4)) {
 			$('#type' + (i+1)).val(eqSettings[i]['type']);
@@ -430,6 +440,8 @@ function loadEQSettings() {
 		var num = new Number(4.0/i);
 		eqSettings.push({"bandNum": i, "type":1, "q":num.toFixed(2), "freq": (100*Math.pow(i,2)), "gain":i*Math.pow(-1,i)});
 	}
+	
+	
 	return eqSettings;
 }
 
@@ -437,15 +449,17 @@ function writeEQSettings() {
 	var eqSettings = [];
 	for (i=0; i<4; i++) {
 		var temp = {};
-		if ((i == 1) || (i == 4)) {
-			temp['type'] = $('#type' + (i+1)).val();
-		} else temp['type'] = 1;
+		if ((i == 0) || (i == 3)) {
+			temp['t'] = $('#type' + (i+1)).val();
+		} else temp['t'] = 1;
 		temp['q'] = $('[band="' + (i+1) + '"] .q').val();
-		temp['freq'] = $('[band="' + (i+1) + '"] .freq').val();
-		temp['gain'] = $('[band="' + (i+1) + '"] .gain').val();
+		temp['f'] = $('[band="' + (i+1) + '"] .freq').val();
+		temp['g'] = $('[band="' + (i+1) + '"] .gain').val();
+		temp['e'] = enable;
+		temp['b'] = i+1;
 		eqSettings.push(temp);
 	}	
-	return false;
+	return eqSettings;
 }
 
 function writeCompSettings() {
@@ -458,7 +472,34 @@ function writeCompSettings() {
 
 //write eq settings to Stellaris
 function api_writeEQSettings() {
-	
+	var io = getCurrentIO() ? "o" : "i";
+	var data2 = writeEQSettings();
+
+	var request = $.ajax({
+		url:"a/" + io + "/" + getCurrentChannel() + "/modeq",
+		data: data2[0],
+		success: function() {
+			$.ajax({
+				url:"a/" + io + "/" + getCurrentChannel() + "/modeq",
+				data: data2[1],
+				success: function() {
+					$.ajax({
+						url:"a/" + io + "/" + getCurrentChannel() + "/modeq",
+						data: data2[2],
+						success: function() {
+							$.ajax({
+								url:"a/" + io + "/" + getCurrentChannel() + "/modeq",
+								data: data2[3],
+								success: function() {
+									alert('modified EQ!');
+								}
+						});
+				}
+			});
+		}
+	});
+}
+});
 }
 
 //write compressor settings to Stellaris
