@@ -1,6 +1,12 @@
 //Parameters
-var numOutputs = 8;
-var numInputs = 8;
+var numOutputs = 14;
+var numInputs = 14;
+var api_endpoints = {};
+api_endpoints["chanlist_input"] = "a/i/chanlist.json";//"spoof/chanlist_input.json";  
+api_endpoints["chanlist_output"] = "a/o/chanlist.json"; //"spoof/chanlist_output.json";  
+var globalInputChannels = null;
+var globalOutputChannels = null;
+
 
 //initialize a few vars
 var currentIO = null;  // 0=input, 1=output
@@ -20,13 +26,34 @@ $.mobile.page.prototype.options.domCache = false;
 
 ///// Process Inputs -- proci.htm ////////////
 $('#processInputsPage').live('pagebeforecreate', function(e) {
-	var inputNames = loadActiveInputNames();
+	api_loadInputs(function(apiReturn) {
+		//convert apiReturn to only active channel names
+		var inputChannels = stripInactiveChannels(apiReturn);
+
+		var counter = 0;
+		//loop through all of the links that were created @ 'pagebeforecreate' runtime
+		$('#fillInputButtons > a').each(function() {
+			if(counter < inputChannels.length) {
+				$('span.ui-btn-text', this).text(inputChannels[counter]['name']);
+				$(this).attr('channel', inputChannels[counter]['num']);
+			}
+			counter++;
+		});
+	
+		if(numInputs > inputChannels.length) {
+			$('a[channel=0]').remove();
+		}
+		
+		console.log('before the show');
+		$('#fillInputButtons').show();
+	}); //loadActiveInputNames();
+	
+	for(i=0; i < numInputs; i++) {
+		$('#fillInputButtons').append("<a href='#' data-role='button' class='input' channel='0'></a>");
+		$('#fillInputButtons').hide();
+	}
 	var i = 0;
 	changeTopTitle('Process Inputs');
-	
-	for(i=0; i < inputNames.length; i++) {
-		$('#fillInputButtons').append("<a href='#' data-role='button' class='input' channel='" + (i+1) + "'>" + inputNames[i] + "</a>");
-	}
 });
 
 $('.input').live('click',function(e) {
@@ -39,13 +66,34 @@ $('.input').live('click',function(e) {
 
 ///// Process Outputs -- proco.htm ///////////
 $('#processOutputsPage').live('pagebeforecreate', function(e) {
-	var outputNames = loadOutputNameArray();
-	var j = 0;
-	changeTopTitle('Process Inputs');
 	
-	for(j=0; j < outputNames.length; j++) {
-		$('#fillOutputButtons').append("<a href='#' data-role='button' class='output' channel='" + (j+1) + "'>" + outputNames[j] + "</a>");
+	api_loadOutputs(function(apiReturn) {
+		//convert apiReturn to only active channel names
+		console.log(apiReturn);
+		var outputChannels = stripInactiveChannels(apiReturn);
+		console.log(outputChannels);
+		var counter = 0;
+		//loop through all of the links that were created @ 'pagebeforecreate' runtime
+		$('#fillOutputButtons > a').each(function() {
+			if(counter < outputChannels.length) {
+				$('span.ui-btn-text', this).text(outputChannels[counter]['name']);
+				$(this).attr('channel', outputChannels[counter]['num']);
+			}
+			counter++;
+		});
+	
+		if(numOutputs > outputChannels.length) {
+			$('a[channel=0]').remove();
+		}
+
+		$('#fillOutputButtons').show();
+	});
+	
+	for(i=0; i < numOutputs; i++) {
+		$('#fillOutputButtons').append("<a href='#' data-role='button' class='output' channel='0'></a>");
+		$('#fillOutputButtons').hide();
 	}
+	changeTopTitle('Process Outputs');
 });
 
 $('.output').live('click',function(e) {
@@ -66,7 +114,11 @@ $('#inputPage').live('pagebeforeshow', function (event, ui) {
 ////////Output Processing Selection -- output.htm ///////////////
 $('#outputPage').live('pagebeforeshow', function (event, ui) {
 	if(getCurrentChannel() > 0 && getCurrentChannel() < 99) {
-		$('#outputTitle').text('Output ' + getOutputName(getCurrentChannel()));
+		var outputName = getActiveOutputName(getCurrentChannel());
+		
+		if(outputName == null) $.mobile.changePage('index.htm', {reverse: true});
+		
+		$('#outputTitle').text('Output ' + outputName);
 	} else $.mobile.changePage('index.htm', {reverse: true});
 });
 
@@ -94,7 +146,7 @@ $("#eqPage").live('pagebeforeshow',function(event) {
 	setEnableDisableButton();
 
 	if( getCurrentIO() == 1) {
-		$('.eqTitle').text('EQ Output ' + getOutputName(getCurrentChannel()));
+		$('.eqTitle').text('EQ Output ' + getActiveOutputName(getCurrentChannel()));
 	} else if (getCurrentIO() == 0){
 		$('.eqTitle').text('EQ Input ' + getActiveInputName(getCurrentChannel()));
 	} else $.mobile.changePage('index.htm', {reverse: true});
@@ -107,9 +159,8 @@ $("#eqPage").live('pagebeforeshow',function(event) {
 		url: "a/" + io + "/" + getCurrentChannel() + "/eqparams.json",
   	dataType: 'json',
 		cache: false,
-		success: function(data){ alert('success'); },
+		success: function(data){ updateEQSettings(data); },
 		error: function(data) {alert('error')},
-		complete: function(data){alert('complete'); updateEQSettings(data)}
 	});
 	
 });
@@ -143,12 +194,20 @@ $("#compPage").live('pagebeforeshow',function(event) {
 	setEnableDisableButton();
 	
 	if( getCurrentIO() == 1 ) {
-		$('.compTitle').text('Comp Output ' + getOutputName(getCurrentChannel()));
+		$('.compTitle').text('Comp Output ' + getActiveOutputName(getCurrentChannel()));
 	} else if (getCurrentIO() == 0) {
 		$('.compTitle').text('Comp Input ' + getActiveInputName(getCurrentChannel()));
 	} else $.mobile.changePage('input.htm');
 	
-	updateCompSettings();
+	var io = getCurrentIO() ? "o" : "i";
+	var request = $.ajax({
+		type: 'GET',
+		url: "a/" + io + "/" + getCurrentChannel() + "/compparams.json",
+  		dataType: 'json',
+		cache: false,
+		success: function(data){ updateCompSettings(data); },
+		error: function(data) {alert('error')},
+	});
 });
 
 $('#compApply').live('click',function(e) {
@@ -269,9 +328,12 @@ $('#enableDisable').live('click',function(e) {
 	e.stopImmediatePropagation();
 	e.preventDefault();
 	setEnableDisableButton();
-	if (enable) {
- 		$.ajax("c/hey");
-	} else $.ajax("c/bye");
+	console.log("enable");
+	console.log(enable);
+	
+	if($('#compApply') != null) {
+		api_writeCompSettings();
+	} else if ($('#eqApply') != null) api_writeEQSettings();
 
 	return false;
 });
@@ -280,6 +342,14 @@ $('#enableDisable').live('click',function(e) {
 ///////////////////////////////////////////////////////////////////////////
 //////////////////   FUNCTIONS!! //////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
+
+function stripInactiveChannels(apiData) {
+	activeInputs = [];
+	for (i=0; i<numInputs; i++) {
+		if(apiData[i]["a"] == 1) activeInputs.push(apiData[i]);
+	}
+	return activeInputs;
+}
 
 //  Extract ALL input channel names (active AND inactive)
 //   order is maintained
@@ -294,33 +364,51 @@ function loadInputNameArray() {
 }
 
 //  sets the Enable/Disable button on a page
-//    if enable is null then it executes loadEnableStatus();
-function setEnableDisableButton() {
+//    if enable is null then it places the value from the parameter
+function setEnableDisableButton(data) {
 	if (enable == null) {
-		enable = loadEnableStatus();
+		enable = data;
 	}
-	if(enable == 1) {
+	if(enable == 0) {
+		enable=1;
 		$('#enableDisable .ui-btn-text').text('Disable');
-		enable=0;
 	}
 	else {
+		enable=0;
 		$('#enableDisable .ui-btn-text').text('Enable');
-		enable=1;
 	}
 }
 
 function loadActiveInputNames() {
 	var i=0;
 	var activeInputNames = [];
-	var inputInf = loadInputs();
+	var inputInf = globalInputChannels;//loadInputs();
 	for (i=0; i< numInputs; i++) {
-		if(inputInf[i]['active'] == 1) activeInputNames.push(inputInf[i]['name']);
+		if(inputInf[i]['a'] == 1) activeInputNames.push(inputInf[i]['name']);
 	}
 	return activeInputNames;
 }
 
-function getOutputName(o) {
-	return loadOutputNameArray()[o-1];
+function loadActiveOutputNames() {
+	var i=0;
+	var activeOutputNames = [];
+	if (globalOutputChannels != null) {
+		var outputInf = globalOutputChannels;
+		for (i=0; i< numOutputs; i++) {
+			if(outputInf[i]['a'] == 1) activeOutputNames.push(outputInf[i]['name']);
+		} 
+	} else return null;
+	return activeOutputNames;
+}
+
+function getActiveOutputName(o) {
+	temp = loadActiveOutputNames();
+	if(temp != null) {
+		return loadActiveOutputNames()[o-1];
+	} else {
+		return null;
+	}
+	
 }
 
 function getActiveInputName(i) {
@@ -366,15 +454,18 @@ function updateEQSettings(eqSettings) {
 		$('[band="' + (i+1) + '"] .freq').val(eqSettings[i]['freq']);
 		$('[band="' + (i+1) + '"] .gain').val(eqSettings[i]['gain']);
 	}
+	setEnableDisableButton(eqSettings[0]['enable']);
 }
 
-function updateCompSettings() {
-	var values = loadCompSettings();
+function updateCompSettings(compSettings) {
+	var values = compSettings;
+	console.log(values);
 	$('#compRatio').val(values['ratio']);
 	$('#compThreshold').val(values['threshold']);
 	$('#compAttack').val(values['attack']);
 	$('#compRelease').val(values['release']);
 	$('#compGain').val(values['gain']);
+	setEnableDisableButton(values['enable']);
 }
 
 
@@ -397,6 +488,7 @@ function loadActiveInputStatus() {
 
 function loadEnableStatus() {
 	status = 0; // 0=disable processing, 1=enabled
+	
 	return status; 
 }
 
@@ -463,8 +555,8 @@ function writeEQSettings() {
 }
 
 function writeCompSettings() {
-	var compSettings = {"ratio": $('#compRatio').val(), "threshold": $('#compThreshold').val(), "attack": $('#compAttack').val(), "release": $('#compRelease').val(), "gain": $('#compGain').val()};
-	return false;
+	var compSettings = {"r": $('#compRatio').val(), "t": $('#compThreshold').val(), "a": $('#compAttack').val(), "rls": $('#compRelease').val(), "g": $('#compGain').val(), "e": enable};
+	return compSettings;
 }
 
 /////////////////////API FUNCTIONS /////////////////////////////////
@@ -473,38 +565,49 @@ function writeCompSettings() {
 //write eq settings to Stellaris
 function api_writeEQSettings() {
 	var io = getCurrentIO() ? "o" : "i";
-	var data2 = writeEQSettings();
+	var eqdata = writeEQSettings();
+	var api_url = "a/" + io + "/" + getCurrentChannel() + "/modeq";
 
 	var request = $.ajax({
-		url:"a/" + io + "/" + getCurrentChannel() + "/modeq",
-		data: data2[0],
+		url: api_url,
+		data: eqdata[0],
 		success: function() {
 			$.ajax({
-				url:"a/" + io + "/" + getCurrentChannel() + "/modeq",
-				data: data2[1],
+				url: api_url,
+				data: eqdata[1],
 				success: function() {
 					$.ajax({
-						url:"a/" + io + "/" + getCurrentChannel() + "/modeq",
-						data: data2[2],
+						url: api_url,
+						data: eqdata[2],
 						success: function() {
 							$.ajax({
-								url:"a/" + io + "/" + getCurrentChannel() + "/modeq",
-								data: data2[3],
+								url: api_url,
+								data: eqdata[3],
 								success: function() {
-									alert('modified EQ!');
+									console.log("sent EQ settings successfully!");
 								}
-						});
+							});
+						}
+					});
 				}
 			});
 		}
 	});
 }
-});
-}
 
 //write compressor settings to Stellaris
 function api_writeCompSettings() {
+	var compdata = writeCompSettings();
+	var io = getCurrentIO() ? "o" : "i";
+	var api_url = "a/" + io + "/" + getCurrentChannel() + "/modcomp";
 	
+	$.ajax({
+		url: api_url,
+		data: compdata,
+		success: function() {
+			console.log("sent comp settings successfully!");
+		}
+	});
 }
 
 //rename a single channel
@@ -513,8 +616,21 @@ function api_renameChannel(channelNumber) {
 }
 
 //load the names of outputs
-function api_loadOutputNameArray() {
-	
+function api_loadOutputs(callback) {
+	$.ajax({
+		url:api_endpoints["chanlist_output"],
+		dataType: 'json',
+		cache:false,
+		error: function () {
+			alert('error loading outputs via api');
+		},
+		complete: function() {
+		},
+		success: function(data) {
+			callback(data);
+			globalOutputChannels = data;
+		}
+	});
 }
 
 //load the matrix routing
@@ -523,8 +639,21 @@ function api_loadMatrixRoutes() {
 }
 
 //load input hash of status and name
-function api_loadInputs() {
-	
+function api_loadInputs(callback) {
+	$.ajax({
+		url:api_endpoints["chanlist_input"],
+		dataType: 'json',
+		cache:false,
+		error: function () {
+			alert('error loading inputs via api');
+		},
+		complete: function() {
+		},
+		success: function(data) {
+			callback(data);
+			globalInputChannels = data;
+		}
+	});
 }
 
 //load breakout box status and name
