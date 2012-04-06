@@ -1,11 +1,12 @@
 //Parameters
-var numOutputs = 14;
-var numInputs = 14;
+var numOutputs = 2;
+var numInputs = 2;
 var api_endpoints = {};
-api_endpoints["chanlist_input"] = "a/i/chanlist.json";//"spoof/chanlist_input.json";  
+api_endpoints["chanlist_input"] = "a/i/chanlist.json";// "spoof/chanlist_input.json";
 api_endpoints["chanlist_output"] = "a/o/chanlist.json"; //"spoof/chanlist_output.json";  
 var globalInputChannels = null;
 var globalOutputChannels = null;
+var labels_changed = [];
 
 
 //initialize a few vars
@@ -149,7 +150,7 @@ $("#eqPage").live('pagebeforeshow',function(event) {
 		$('.eqTitle').text('EQ Output ' + getActiveOutputName(getCurrentChannel()));
 	} else if (getCurrentIO() == 0){
 		$('.eqTitle').text('EQ Input ' + getActiveInputName(getCurrentChannel()));
-	} else $.mobile.changePage('index.htm', {reverse: true});
+	} ///else $.mobile.changePage('index.htm', {reverse: true});
 	
 	////Put specs from API into page
 	//fire off XHR request with callback for updateEQSettings
@@ -158,7 +159,7 @@ $("#eqPage").live('pagebeforeshow',function(event) {
 		type: 'GET',
 		url: "a/" + io + "/" + getCurrentChannel() + "/eqparams.json",
   	dataType: 'json',
-		cache: false,
+		//cache: false,
 		success: function(data){ updateEQSettings(data); },
 		error: function(data) {alert('error')},
 	});
@@ -203,8 +204,8 @@ $("#compPage").live('pagebeforeshow',function(event) {
 	var request = $.ajax({
 		type: 'GET',
 		url: "a/" + io + "/" + getCurrentChannel() + "/compparams.json",
-  		dataType: 'json',
-		cache: false,
+  	dataType: 'json',
+		//cache: false,
 		success: function(data){ updateCompSettings(data); },
 		error: function(data) {alert('error')},
 	});
@@ -247,23 +248,93 @@ $('#matrixApply').live('click',function(e) {
 	return false;
 });
 
+
 ///////// Label Inputs Page -- labeli.htm ///////////////////
 $('#labelInputsPage').live('pagebeforecreate', function(event,ui) {
-	var names = loadInputNameArray();
+	api_loadInputs(function(apiReturn) {
+		//convert apiReturn to only active channel names
+		var inputChannels = apiReturn;
+
+		var counter = 0;
+		//loop through all of the links that were created @ 'pagebeforecreate' runtime
+		$('#labelInputsFill > div').each(function() {
+
+			if(counter < inputChannels.length) {
+				$('[for=label]', this).text(inputChannels[counter]['name']);
+				$('label',this).attr('for', 'label' + inputChannels[counter]['num']);
+				$('input',this).attr('id', 'label' + inputChannels[counter]['num']);
+				$('input',this).attr('name', 'label' + inputChannels[counter]['num']);
+				$('input',this).attr('value',inputChannels[counter]['name']);
+				$('input',this).attr('channel',counter+1);
+			}
+			counter++;
+		});
+	
+		if(numInputs > inputChannels.length) {
+			$('label[for=label],input[id=label]').remove();
+		}
+		
+		$('#fillInputButtons').show();
+		
+		$('input[type=text]').change( function(e) {
+			api_renameChannel(0,$(this).attr('channel'), $(this).attr('value'));
+		});
+	});
+	
 	changeTopTitle('Label Inputs');
 	var j = 1;
-	for(j = 1; j <= names.length; j++) {
-		$('#labelInputsFill').append("<div data-role='fieldcontain'><label for='label" + j + "' class='basic'>" + names[j-1] + "</label><input type='text' name='label" + j + "' id='label"+ j + "' value='" + names[j-1] + "'\></div>");
+	for(j = 1; j <= numInputs; j++) {
+		$('#labelInputsFill').append("<div data-role='fieldcontain'><label for='label' class='basic'></label><input type='text' name='label' id='label' value=''\></div>");
 	}
+});
+
+//event listener for Apply button on labeli.htm
+$('#labelInputsApply').live('click',function(e) {
+	e.stopImmediatePropagation();
+	e.preventDefault();
+	
+	
+	return false;
 });
 
 /////////// Label Outputs Page -- labelo.htm ////////////////
 $('#labelOutputsPage').live('pagebeforecreate', function(event,ui) {
-	var names = loadOutputNameArray();
-	changeTopTitle('Label Outputs');
+	
+	api_loadOutputs(function(apiReturn) {
+		//convert apiReturn to only active channel names
+		var outputChannels = apiReturn;
+
+		var counter = 0;
+		//loop through all of the links that were created @ 'pagebeforecreate' runtime
+		$('#labelOutputFill > div').each(function() {
+
+			if(counter < outputChannels.length) {
+				$('[for=label]', this).text(outputChannels[counter]['name']);
+				$('label',this).attr('for', 'label' + outputChannels[counter]['num']);
+				$('input',this).attr('id', 'label' + outputChannels[counter]['num']);
+				$('input',this).attr('name', 'label' + outputChannels[counter]['num']);
+				$('input',this).attr('value',outputChannels[counter]['name']);
+				$('input',this).attr('channel',counter+1);
+			}
+			counter++;
+		});
+	
+		if(numOutputs > outputChannels.length) {
+			$('label[for=label],input[id=label]').remove();
+		}
+		
+		changeTopTitle('Label Outputs');
+		$('#fillOutputButtons').show();
+		
+		$('input[type=text]').change( function(e) {
+			api_renameChannel(1,$(this).attr('channel'), $(this).attr('value'));
+		});
+	});
+	
+
 	var j = 1;
-	for(j = 1; j <= names.length; j++) {
-		$('#labelOutputFill').append("<div data-role='fieldcontain'><label for='label" + j + "' class='basic'>" + names[j-1] + "</label><input type='text' name='label" + j + "' id='label"+ j + "' value='" + names[j-1] + "'\></div>");
+	for(j = 1; j <= numOutputs; j++) {
+		$('#labelOutputFill').append("<div data-role='fieldcontain'><label for='label' class='basic'></label><input type='text' name='label' id='label' value=''\></div>");
 	}
 });
 
@@ -331,9 +402,9 @@ $('#enableDisable').live('click',function(e) {
 	console.log("enable");
 	console.log(enable);
 	
-	if($('#compApply') != null) {
+	if( $('#compApply').exists() ) {
 		api_writeCompSettings();
-	} else if ($('#eqApply') != null) api_writeEQSettings();
+	} else if ( $('#eqApply').exists() ) api_writeEQSettings();
 
 	return false;
 });
@@ -445,7 +516,6 @@ function setCurrentChannelAndIO(channel,io) {
 }
 
 function updateEQSettings(eqSettings) {
-	eqSettings = $.parseJSON(eqSettings['responseText']);
 	for (i=0; i<4; i++) {
 		if ((eqSettings[i]['bandNum'] == 1) || (eqSettings[i]['bandNum'] == 4)) {
 			$('#type' + (i+1)).val(eqSettings[i]['type']);
@@ -611,8 +681,19 @@ function api_writeCompSettings() {
 }
 
 //rename a single channel
-function api_renameChannel(channelNumber) {
+function api_renameChannel(io,channelNumber, name) {
+	var ioc = io ? 'o' : 'i';
+	var api_url = "a/" + ioc + "/" + channelNumber + "/rename";
 	
+	data2 = {"name":name};
+	
+	$.ajax({
+		url: api_url,
+		data: data2,
+		success: function() {
+			console.log("channel renamed successfully");
+		}
+	});
 }
 
 //load the names of outputs
@@ -620,7 +701,7 @@ function api_loadOutputs(callback) {
 	$.ajax({
 		url:api_endpoints["chanlist_output"],
 		dataType: 'json',
-		cache:false,
+		//cache:false,
 		error: function () {
 			alert('error loading outputs via api');
 		},
@@ -643,7 +724,7 @@ function api_loadInputs(callback) {
 	$.ajax({
 		url:api_endpoints["chanlist_input"],
 		dataType: 'json',
-		cache:false,
+		//cache:false,
 		error: function () {
 			alert('error loading inputs via api');
 		},
@@ -710,3 +791,7 @@ jQuery.cookie = function (key, value, options) {
     var result, decode = options.raw ? function (s) { return s; } : decodeURIComponent;
     return (result = new RegExp('(?:^|; )' + encodeURIComponent(key) + '=([^;]*)').exec(document.cookie)) ? decode(result[1]) : null;
 };
+
+$.fn.exists = function () {
+    return this.length !== 0;
+}

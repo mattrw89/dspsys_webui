@@ -18,7 +18,7 @@
 		</dict>
 	</array>
 	<key>fileHierarchyDrawerWidth</key>
-	<integer>85</integer>
+	<integer>159</integer>
 	<key>metaData</key>
 	<dict>
 		<key>bobstat.htm</key>
@@ -70,14 +70,14 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>70</integer>
+				<integer>65</integer>
 				<key>line</key>
-				<integer>7</integer>
+				<integer>30</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>0</integer>
+			<integer>8</integer>
 		</dict>
 		<key>css/styles.css</key>
 		<dict>
@@ -140,14 +140,14 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>15</integer>
+				<integer>34</integer>
 				<key>line</key>
-				<integer>586</integer>
+				<integer>4</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>537</integer>
+			<integer>0</integer>
 		</dict>
 		<key>labelb.htm</key>
 		<dict>
@@ -283,7 +283,19 @@
 	</array>
 	<key>showFileHierarchyDrawer</key>
 	<false/>
+	<key>showFileHierarchyPanel</key>
+	<true/>
+	<key>treeState</key>
+	<dict>
+		<key>dspsys_webui</key>
+		<dict>
+			<key>isExpanded</key>
+			<true/>
+			<key>subItems</key>
+			<dict/>
+		</dict>
+	</dict>
 	<key>windowFrame</key>
-	<string>{{0, 4}, {1075, 1024}}</string>
+	<string>{{0, 4}, {865, 1024}}</string>
 </dict>
 </plist>
