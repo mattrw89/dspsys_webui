@@ -21,6 +21,20 @@
 	<integer>159</integer>
 	<key>metaData</key>
 	<dict>
+		<key>assets/knobKnob/knobKnob.jquery.js</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>8</integer>
+				<key>line</key>
+				<integer>101</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>3</integer>
+		</dict>
 		<key>bobstat.htm</key>
 		<dict>
 			<key>caret</key>
@@ -98,14 +112,14 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>36</integer>
+				<integer>71</integer>
 				<key>line</key>
-				<integer>101</integer>
+				<integer>87</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>76</integer>
+			<integer>71</integer>
 		</dict>
 		<key>index.htm</key>
 		<dict>
@@ -140,14 +154,30 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>34</integer>
+				<integer>0</integer>
 				<key>line</key>
-				<integer>4</integer>
+				<integer>211</integer>
 			</dict>
+			<key>columnSelection</key>
+			<false/>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>0</integer>
+			<integer>180</integer>
+			<key>selectFrom</key>
+			<dict>
+				<key>column</key>
+				<integer>2</integer>
+				<key>line</key>
+				<integer>222</integer>
+			</dict>
+			<key>selectTo</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>211</integer>
+			</dict>
 		</dict>
 		<key>labelb.htm</key>
 		<dict>
@@ -265,6 +295,7 @@
 	<key>openDocuments</key>
 	<array>
 		<string>js/project.js</string>
+		<string>assets/knobKnob/knobKnob.jquery.js</string>
 		<string>eq.htm</string>
 		<string>bobstat.htm</string>
 		<string>input.htm</string>
@@ -292,10 +323,26 @@
 			<key>isExpanded</key>
 			<true/>
 			<key>subItems</key>
-			<dict/>
+			<dict>
+				<key>assets</key>
+				<dict>
+					<key>isExpanded</key>
+					<true/>
+					<key>subItems</key>
+					<dict>
+						<key>knobKnob</key>
+						<dict>
+							<key>isExpanded</key>
+							<true/>
+							<key>subItems</key>
+							<dict/>
+						</dict>
+					</dict>
+				</dict>
+			</dict>
 		</dict>
 	</dict>
 	<key>windowFrame</key>
-	<string>{{0, 4}, {865, 1024}}</string>
+	<string>{{0, 1}, {840, 1024}}</string>
 </dict>
 </plist>

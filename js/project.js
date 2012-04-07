@@ -9,6 +9,405 @@ var globalOutputChannels = null;
 var labels_changed = [];
 
 
+/*!
+ * jQuery Double Tap Plugin.
+ *
+ * Copyright (c) 2010 Raul Sanchez (http://www.appcropolis.com)
+ *
+ * Dual licensed under the MIT and GPL licenses:
+ * http://www.opensource.org/licenses/mit-license.php
+ * http://www.gnu.org/licenses/gpl.html
+ */
+
+
+(function($){
+	// Determine if we on iPhone or iPad
+	var isiOS = false;
+	var agent = navigator.userAgent.toLowerCase();
+	if(agent.indexOf('iphone') >= 0 || agent.indexOf('ipad') >= 0){
+		   isiOS = true;
+	}
+ 
+	$.fn.doubletap = function(onDoubleTapCallback, onTapCallback, delay){
+		var eventName, action;
+		delay = delay == null? 500 : delay;
+		eventName = isiOS == true? 'touchend' : 'click';
+ 
+		$(this).bind(eventName, function(event){
+			var now = new Date().getTime();
+			var lastTouch = $(this).data('lastTouch') || now + 1 /** the first time this will make delta a negative number */;
+			var delta = now - lastTouch;
+			clearTimeout(action);
+			if(delta<500 && delta>0){
+				if(onDoubleTapCallback != null && typeof onDoubleTapCallback == 'function'){
+					onDoubleTapCallback(event);
+				}
+			}else{
+				$(this).data('lastTouch', now);
+				action = setTimeout(function(evt){
+					if(onTapCallback != null && typeof onTapCallback == 'function'){
+						onTapCallback(evt);
+					}
+					clearTimeout(action);   // clear the timeout
+				}, delay, [event]);
+			}
+			$(this).data('lastTouch', now);
+		});
+	};
+})(jQuery);
+
+$(function(){
+	
+	var colors = [
+		'26e000','2fe300','37e700','45ea00','51ef00',
+		'61f800','6bfb00','77ff02','80ff05','8cff09',
+		'93ff0b','9eff09','a9ff07','c2ff03','d7ff07',
+		'f2ff0a','fff30a','ffdc09','ffce0a','ffc30a',
+		'ffb509','ffa808','ff9908','ff8607','ff7005',
+		'ff5f04','ff4f03','f83a00','ee2b00','e52000'
+	];
+	
+	var colorsGain = [
+	
+	
+	'bf0000','c31212','c82424','cc3636','d14848','d65b5b',
+	'da6d6d','df7f7f','e39191','e8a3a3','ecb6b6','f1c8c8',
+	'f5dada','faecec','ffffff','ffffff','ececfa','dadaf5',
+	'c8c8f1','b6b6ec','a3a3e8','9191e3','7f7fdf','6d6dda',
+	'5b5bd6','4848d1','3636cc','2424c8','1212c3','0000bf',
+	
+	];
+	
+	var colorsFreq = [
+	//'1c00e2','2200dc','2800d6','2e00d0','3400ca',
+	'3900c5','3f00bf','4500b9','4b00b3','5100ad',
+	'5600a8','5c00a2','62009c','680096','6e0090',
+	'73008b','790085','7f007f','850079','8b0073',
+	'90006e','960068','9c0062','a2005c','a80056',
+	'ad0051','b3004b','b90045','bf003f','c50039',
+	'ad0051','b3004b','b90045','bf003f','c50039'
+	];
+	/*
+	'ad0051','b3004b','b90045','bf003f','c50039',
+	'ca0034','d0002e','d60028','dc0022','e2001c',
+	'e70017','ed0011','f3000b','f90005','ff0000'
+	*/
+	
+	var rad2deg = 180/Math.PI;
+	var deg = 0;
+	var barsQ = $('#barsQ');
+	var barsFreq = $('#barsFreq');
+	var barsGain = $('#barsGain');
+	var qDeg = 70;
+	var gainDeg=180;
+	var freqDeg=180.7;
+	var setFreq=0;
+	
+	for(var i=0;i<colors.length;i++){
+		
+		deg = i*12;
+		
+		// Create the colorbars
+		
+		$('<div class="colorBar">').css({
+			backgroundColor: '#'+colors[i],
+			transform:'rotate('+deg+'deg)',
+			top: -Math.sin(deg/rad2deg)*80+100,
+			left: Math.cos((180 - deg)/rad2deg)*80+100,
+		}).appendTo(barsQ);
+	}
+	
+	for(var i=0;i<colorsFreq.length;i++){
+		
+		deg = i*12;
+		
+		// Create the colorbars
+		
+		$('<div class="colorBar">').css({
+			backgroundColor: '#'+colorsFreq[i],
+			transform:'rotate('+deg+'deg)',
+			top: -Math.sin(deg/rad2deg)*80+100,
+			left: Math.cos((180 - deg)/rad2deg)*80+100,
+		}).appendTo(barsFreq);
+	}
+	
+	for(var i=0;i<colorsGain.length;i++){
+		
+		deg = i*12;
+		
+		// Create the colorbars
+		
+		$('<div class="colorBar">').css({
+			backgroundColor: '#'+colorsGain[i],
+			transform:'rotate('+deg+'deg)',
+			top: -Math.sin(deg/rad2deg)*80+100,
+			left: Math.cos((180 - deg)/rad2deg)*80+100,
+		}).appendTo(barsGain);
+	}
+
+
+
+	var colorBarsQ = barsQ.find('.colorBar');
+	var numBarsQ = 0, lastNumQ = -1;
+	
+	var colorBarsFreq = barsFreq.find('.colorBar');
+	var numBarsFreq = 0, lastNumFreq = -1;
+	
+	var colorBarsGain = barsGain.find('.colorBar');
+	var numBarsGain = 0, lastNumGain = -1;
+	
+	setQknob(qDeg);
+	setGainknob(gainDeg);
+	setFreqknob(freqDeg);
+	
+function setQknob(qDeg){	
+	$('#controlQ').knobKnob({
+		snap : 18,
+		value: qDeg,
+		turn : function(ratio){
+			numBarsQ = Math.round(colorBarsQ.length*ratio);
+			
+			// Update the dom only when the number of active bars
+			// changes, instead of on every move
+			
+			if(numBarsQ == lastNumQ){
+				return false;
+			}
+			lastNumQ = numBarsQ;
+			$('#qText').val(convertDegToQuality(ratio*359));
+			
+			colorBarsQ.removeClass('active').slice(0, numBarsQ).addClass('active');
+			colorBarsQ.slice(0,1).addClass('active');
+		}
+	});
+}
+
+	
+	$('#qText').change(this,function(){
+		$('#controlQ').empty();
+		//$('#barsQ').append('<div id="controlQ" field="q"></div>');
+		
+		var q=$('#qText').val();
+		
+		if(q<=.5){
+			$('#qText').val(.5);
+			qDeg=20;
+		}
+		if(q>10){
+			$('#qText').val(10);
+			qDeg=359;
+		}
+		else{
+			qDeg = q*35.9;
+		}
+	
+		setQknob(qDeg);
+	});
+	
+	$('#controlQ').doubletap(
+	    /** doubletap-dblclick callback */
+	    function(event){
+	    	$('#controlQ').empty();
+				setQknob(35);
+	    },
+	    /** touch-click callback (touch) */
+	    function(event){
+	    },
+	    /** doubletap-dblclick delay (default is 500 ms) */
+	    400
+	);
+	
+function setFreqknob(freqDeg){	
+	$('#controlFreq').knobKnob({
+		snap : 1,
+		value: freqDeg,
+		turn : function(ratio){
+			numBarsFreq = Math.round(colorBarsFreq.length*ratio);
+			
+			// Update the dom only when the number of active bars
+			// changes, instead of on every move
+			
+			if(numBarsFreq == lastNumFreq){
+				return false;
+			}
+			lastNumFreq = numBarsFreq;
+			if(setFreq==0){
+				$('#freqText').val(convertDegToFreq(ratio*359));
+			}
+			setFreq=0;
+			colorBarsFreq.removeClass('active').slice(0, numBarsFreq).addClass('active');
+		}
+	});
+}
+
+	$('#freqText').change(this,function(){
+		$('#controlFreq').empty();
+		
+		var freq=$('#freqText').val();
+		
+		setFreq=1;
+		
+		if(freq < 54){
+			freq = 54;
+		}
+		if(freq>20000){
+			freq=20000;
+		}
+		
+		$('#freqText').val(freq)
+		
+		//console.log("Got"+freq);
+		
+		freq = (Math.log(freq)/Math.log(10));
+	
+		//console.log("log check "+freq);
+		//console.log(freq/.00725);
+	
+		freq=(freq-1.6989)/0.00725;
+	
+		//console.log("FreqDeg " + freq);
+	
+		setFreqknob(freq);
+	});
+	
+		$('#controlFreq').doubletap(
+		    /** doubletap-dblclick callback */
+		    function(event){
+		    	$('#controlFreq').empty();
+					setFreqknob(180.7);
+		    },
+		    /** touch-click callback (touch) */
+		    function(event){
+		    },
+		    /** doubletap-dblclick delay (default is 500 ms) */
+		    400
+		);
+	
+
+
+function setGainknob(gainDeg){
+	$('#controlGain').knobKnob({
+		snap : 1,
+		value: gainDeg,
+		turn : function(ratio){
+			numBarsGain = Math.round(colorBarsGain.length*ratio);
+			
+			// Update the dom only when the number of active bars
+			// changes, instead of on every move
+			
+			if(numBarsGain == lastNumGain){
+				return false;
+			}
+			lastNumGain = numBarsGain;
+			$('#gainText').val(convertDegToGain(ratio*359));
+			//console.log("turn" + convertDegToGain(ratio*359));
+			
+			if(numBarsGain > 15) {
+
+				colorBarsGain.removeClass('active').slice(15, numBarsGain).addClass('active');
+			} else {
+				colorBarsGain.removeClass('active').slice(numBarsGain, 15).addClass('active');
+			}
+			colorBarsGain.slice(15,16).addClass('active');
+		}
+	});
+}
+	
+	$('#gainText').change(this,function(){
+		$('#controlGain').empty();
+		//$('#barsQ').append('<div id="controlQ" field="q"></div>');
+		
+		var k=$('#gainText').val();
+		
+		if(k <= -15){
+			k=-15;
+			$('#gainText').val(-15);	
+			gainDeg = 1;
+		}
+		if(k >= 15){
+			k=15;
+			$('#gainText').val(15);
+			gainDeg = 359;
+		}
+		
+		if(k < 0 && k > -15){
+			gainDeg= k*11.9667 +15*11.9667;
+		}
+		if(k >= 0 && k < 15){
+			gainDeg=k*11.9667+180;
+		}
+
+		setGainknob(gainDeg);
+	});
+	
+	$('#controlGain').doubletap(
+	    /** doubletap-dblclick callback */
+	    function(event){
+	    	$('#controlGain').empty();
+				setGainknob(180);
+	    },
+	    /** touch-click callback (touch) */
+	    function(event){
+	    },
+	    /** doubletap-dblclick delay (default is 500 ms) */
+	    400
+	);
+});
+
+
+
+function convertDegToQuality(degrees) {
+	var q;
+	degrees = degrees +1;
+	
+	//console.log("Q Deg "+degrees);
+	if(degrees<20) {
+			q=0.5;
+			degrees=18;
+		}
+	
+	q=degrees/35.9;
+	
+	q = Math.round(q*10)/10;
+	
+	return q;
+}
+
+function convertDegToFreq(degrees){
+	var freq;
+	
+	freq = .0072*degrees+1.6989;
+	 
+	freq = (Math.pow(10,freq));
+	
+	freq = Math.round(freq);
+	
+	
+	return freq;
+}
+
+function convertDegToGain(degrees) {
+	var Gain;
+	
+	if(degrees < 180) {
+		
+		Gain = degrees/11.96667 - 15;
+	
+	}
+	if(degrees >= 180){
+		 
+		Gain =  (degrees-180)/11.9997;
+		
+	}
+	Gain = Math.round(Gain*5)/5;
+	
+	return Gain;
+}
+
+
+
+
+
 //initialize a few vars
 var currentIO = null;  // 0=input, 1=output
 var currentChannel = 0;
@@ -748,6 +1147,23 @@ function api_loadIOStatusInfo() {
 }
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 //////////////////////////////////////////////////////////////////////////////
 
 /**
@@ -795,3 +1211,7 @@ jQuery.cookie = function (key, value, options) {
 $.fn.exists = function () {
     return this.length !== 0;
 }
+
+
+
+
