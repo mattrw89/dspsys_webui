@@ -3,10 +3,35 @@ var numOutputs = 2;
 var numInputs = 2;
 var api_endpoints = {};
 api_endpoints["chanlist_input"] = "a/i/chanlist.json";// "spoof/chanlist_input.json";
-api_endpoints["chanlist_output"] = "a/o/chanlist.json"; //"spoof/chanlist_output.json";  
+api_endpoints["chanlist_output"] = "spoof/chanlist_output.json";//"a/o/chanlist.json"; //"spoof/chanlist_output.json";  
 var globalInputChannels = null;
 var globalOutputChannels = null;
 var labels_changed = [];
+var eqData = [];
+var bandSelected = 1;
+
+
+
+var rad2deg = 180/Math.PI;
+var deg = 0;
+var barsQ;
+var barsFreq;
+var barsGain;
+var qDeg = 70;
+var gainDeg=180;
+var freqDeg=180.7;
+var setFreq=0;
+
+
+var colorBarsQ = 0;// = barsQ.find('.colorBar');
+var numBarsQ = 0, lastNumQ = -1;
+
+var colorBarsFreq=0;// = barsFreq.find('.colorBar');
+var numBarsFreq = 0, lastNumFreq = -1;
+
+var colorBarsGain=0;// = barsGain.find('.colorBar');
+var numBarsGain = 0, lastNumGain = -1;
+
 
 
 /*!
@@ -56,318 +81,6 @@ var labels_changed = [];
 	};
 })(jQuery);
 
-$(function(){
-	
-	var colors = [
-		'26e000','2fe300','37e700','45ea00','51ef00',
-		'61f800','6bfb00','77ff02','80ff05','8cff09',
-		'93ff0b','9eff09','a9ff07','c2ff03','d7ff07',
-		'f2ff0a','fff30a','ffdc09','ffce0a','ffc30a',
-		'ffb509','ffa808','ff9908','ff8607','ff7005',
-		'ff5f04','ff4f03','f83a00','ee2b00','e52000'
-	];
-	
-	var colorsGain = [
-	'bf0000','c31212','c82424','cc3636','d14848','d65b5b',
-	'da6d6d','df7f7f','e39191','e8a3a3','ecb6b6','f1c8c8',
-	'f5dada','faecec','ffffff','ffffff','ececfa','dadaf5',
-	'c8c8f1','b6b6ec','a3a3e8','9191e3','7f7fdf','6d6dda',
-	'5b5bd6','4848d1','3636cc','2424c8','1212c3','0000bf',
-	
-	];
-	
-	var colorsFreq = [
-	'3900c5','3f00bf','4500b9','4b00b3','5100ad',
-	'5600a8','5c00a2','62009c','680096','6e0090',
-	'73008b','790085','7f007f','850079','8b0073',
-	'90006e','960068','9c0062','a2005c','a80056',
-	'ad0051','b3004b','b90045','bf003f','c50039',
-	'ad0051','b3004b','b90045','bf003f','c50039'
-	];
-
-	
-	var rad2deg = 180/Math.PI;
-	var deg = 0;
-	var barsQ = $('#barsQ');
-	var barsFreq = $('#barsFreq');
-	var barsGain = $('#barsGain');
-	var qDeg = 70;
-	var gainDeg=180;
-	var freqDeg=180.7;
-	var setFreq=0;
-	
-	var bandSelected = 1;
-	
-	
-	$('.abcd').click(function(e){
-	//	console.log(e);
-		var clicked = e.target.attributes['band'];
-		//console.log(clicked.value);
-		//alert("stop poking me! ");
-		if (clicked.value== 2) {
-			$('div[band=2]').addClass('bandSelected');
-			$('div[band=1]').removeClass('bandSelected');
-			bandSelected = 2;
-		} else {
-			$('div[band=1]').addClass('bandSelected');
-			$('div[band=2]').removeClass('bandSelected');
-			bandSelected = 1;
-		}
-		
-	});
-	
-	
-	
-	for(var i=0;i<colors.length;i++){
-		
-		deg = i*12;
-		
-		// Create the colorbars
-		
-		$('<div class="colorBar">').css({
-			backgroundColor: '#'+colors[i],
-			transform:'rotate('+deg+'deg)',
-			top: -Math.sin(deg/rad2deg)*80+100,
-			left: Math.cos((180 - deg)/rad2deg)*80+100,
-		}).appendTo(barsQ);
-	}
-	
-	for(var i=0;i<colorsFreq.length;i++){
-		
-		deg = i*12;
-		
-		// Create the colorbars
-		
-		$('<div class="colorBar">').css({
-			backgroundColor: '#'+colorsFreq[i],
-			transform:'rotate('+deg+'deg)',
-			top: -Math.sin(deg/rad2deg)*80+100,
-			left: Math.cos((180 - deg)/rad2deg)*80+100,
-		}).appendTo(barsFreq);
-	}
-	
-	for(var i=0;i<colorsGain.length;i++){
-		
-		deg = i*12;
-		
-		// Create the colorbars
-		
-		$('<div class="colorBar">').css({
-			backgroundColor: '#'+colorsGain[i],
-			transform:'rotate('+deg+'deg)',
-			top: -Math.sin(deg/rad2deg)*80+100,
-			left: Math.cos((180 - deg)/rad2deg)*80+100,
-		}).appendTo(barsGain);
-	}
-
-
-
-	var colorBarsQ = barsQ.find('.colorBar');
-	var numBarsQ = 0, lastNumQ = -1;
-	
-	var colorBarsFreq = barsFreq.find('.colorBar');
-	var numBarsFreq = 0, lastNumFreq = -1;
-	
-	var colorBarsGain = barsGain.find('.colorBar');
-	var numBarsGain = 0, lastNumGain = -1;
-	
-	setQknob(qDeg);
-	setGainknob(gainDeg);
-	setFreqknob(freqDeg);
-	
-function setQknob(qDeg){	
-	$('#controlQ').knobKnob({
-		snap : 18,
-		value: qDeg,
-		turn : function(ratio){
-			numBarsQ = Math.round(colorBarsQ.length*ratio);
-			
-			// Update the dom only when the number of active bars
-			// changes, instead of on every move
-			
-			if(numBarsQ == lastNumQ){
-				return false;
-			}
-			lastNumQ = numBarsQ;
-			$('#qText').val(convertDegToQuality(ratio*359));
-			
-			colorBarsQ.removeClass('active').slice(0, numBarsQ).addClass('active');
-			colorBarsQ.slice(0,1).addClass('active');
-		}
-	});
-}
-
-	
-	$('#qText').change(this,function(){
-		$('#controlQ').empty();
-		//$('#barsQ').append('<div id="controlQ" field="q"></div>');
-		
-		var q=$('#qText').val();
-		
-		if(q<=.5){
-			$('#qText').val(.5);
-			qDeg=20;
-		}
-		if(q>10){
-			$('#qText').val(10);
-			qDeg=359;
-		}
-		else{
-			qDeg = q*35.9;
-		}
-	
-		setQknob(qDeg);
-	});
-	
-	$('#controlQ').doubletap(
-	    /** doubletap-dblclick callback */
-	    function(event){
-	    	$('#controlQ').empty();
-				setQknob(35);
-	    },
-	    /** touch-click callback (touch) */
-	    function(event){
-	    },
-	    /** doubletap-dblclick delay (default is 500 ms) */
-	    400
-	);
-	
-function setFreqknob(freqDeg){	
-	$('#controlFreq').knobKnob({
-		snap : 1,
-		value: freqDeg,
-		turn : function(ratio){
-			numBarsFreq = Math.round(colorBarsFreq.length*ratio);
-			
-			// Update the dom only when the number of active bars
-			// changes, instead of on every move
-			
-			if(numBarsFreq == lastNumFreq){
-				return false;
-			}
-			lastNumFreq = numBarsFreq;
-			if(setFreq==0){
-				$('#freqText').val(convertDegToFreq(ratio*359)+ " Hz");
-			}
-			setFreq=0;
-			colorBarsFreq.removeClass('active').slice(0, numBarsFreq).addClass('active');
-		}
-	});
-}
-
-	$('#freqText').change(this,function(){
-		$('#controlFreq').empty();
-		
-		var freq=$('#freqText').val();
-		
-		setFreq=1;
-		
-		if(freq < 54){
-			freq = 54;
-		}
-		if(freq>20000){
-			freq=20000;
-		}
-		
-		$('#freqText').val(freq+" Hz");
-		
-		//console.log("Got"+freq);
-		
-		freq = (Math.log(freq)/Math.log(10));
-	
-		//console.log("log check "+freq);
-		//console.log(freq/.00725);
-	
-		freq=(freq-1.6989)/0.00725;
-	
-		//console.log("FreqDeg " + freq);
-	
-		setFreqknob(freq);
-	});
-	
-		$('#controlFreq').doubletap(
-		    /** doubletap-dblclick callback */
-		    function(event){
-		    	$('#controlFreq').empty();
-					setFreqknob(180.7);
-		    },
-		    /** touch-click callback (touch) */
-		    function(event){
-		    },
-		    /** doubletap-dblclick delay (default is 500 ms) */
-		    400
-		);
-	
-
-
-function setGainknob(gainDeg){
-	$('#controlGain').knobKnob({
-		snap : 1,
-		value: gainDeg,
-		turn : function(ratio){
-			numBarsGain = Math.round(colorBarsGain.length*ratio);
-			
-			// Update the dom only when the number of active bars
-			// changes, instead of on every move
-			
-			if(numBarsGain == lastNumGain){
-				return false;
-			}
-			lastNumGain = numBarsGain;
-			$('#gainText').val(convertDegToGain(ratio*359) + " dB");
-			//console.log("turn" + convertDegToGain(ratio*359));
-			
-			if(numBarsGain > 15) {
-
-				colorBarsGain.removeClass('active').slice(15, numBarsGain).addClass('active');
-			} else {
-				colorBarsGain.removeClass('active').slice(numBarsGain, 15).addClass('active');
-			}
-			colorBarsGain.slice(15,16).addClass('active');
-		}
-	});
-}
-	
-	$('#gainText').change(this,function(){
-		$('#controlGain').empty();
-		//$('#barsQ').append('<div id="controlQ" field="q"></div>');
-		
-		var k=$('#gainText').val();
-		
-		if(k <= -15){
-			k=-15;
-			$('#gainText').val(-15);	
-			gainDeg = 1;
-		}
-		if(k >= 15){
-			k=15;
-			$('#gainText').val(15);
-			gainDeg = 359;
-		}
-		
-		if(k < 0 && k > -15){
-			gainDeg= k*11.9667 +15*11.9667;
-		}
-		if(k >= 0 && k < 15){
-			gainDeg=k*11.9667+180;
-		}
-
-		setGainknob(gainDeg);
-	});
-	
-	$('#controlGain').doubletap(
-	    /** doubletap-dblclick callback */
-	    function(event){
-	    	$('#controlGain').empty();
-				setGainknob(180);
-	    },
-	    /** touch-click callback (touch) */
-	    function(event){
-	    },
-	    /** doubletap-dblclick delay (default is 500 ms) */
-	    400
-	);
-});
 
 
 
@@ -564,18 +277,233 @@ $("#eqPage").live('pagebeforeshow',function(event) {
 		$('.eqTitle').text('EQ Output ' + getActiveOutputName(getCurrentChannel()));
 	} else if (getCurrentIO() == 0){
 		$('.eqTitle').text('EQ Input ' + getActiveInputName(getCurrentChannel()));
-	} ///else $.mobile.changePage('index.htm', {reverse: true});
+	} else $.mobile.changePage('index.htm', {reverse: true});
+	
+	
+	
+//	$(function(){
+
+		var colors = [
+			'26e000','2fe300','37e700','45ea00','51ef00',
+			'61f800','6bfb00','77ff02','80ff05','8cff09',
+			'93ff0b','9eff09','a9ff07','c2ff03','d7ff07',
+			'f2ff0a','fff30a','ffdc09','ffce0a','ffc30a',
+			'ffb509','ffa808','ff9908','ff8607','ff7005',
+			'ff5f04','ff4f03','f83a00','ee2b00','e52000'
+		];
+
+		var colorsGain = [
+		'bf0000','c31212','c82424','cc3636','d14848','d65b5b',
+		'da6d6d','df7f7f','e39191','e8a3a3','ecb6b6','f1c8c8',
+		'f5dada','faecec','ffffff','ffffff','ececfa','dadaf5',
+		'c8c8f1','b6b6ec','a3a3e8','9191e3','7f7fdf','6d6dda',
+		'5b5bd6','4848d1','3636cc','2424c8','1212c3','0000bf',
+
+		];
+
+		var colorsFreq = [
+		'3900c5','3f00bf','4500b9','4b00b3','5100ad',
+		'5600a8','5c00a2','62009c','680096','6e0090',
+		'73008b','790085','7f007f','850079','8b0073',
+		'90006e','960068','9c0062','a2005c','a80056',
+		'ad0051','b3004b','b90045','bf003f','c50039',
+		'ad0051','b3004b','b90045','bf003f','c50039'
+		];
+
+		rad2deg = 180/Math.PI;
+		deg = 0;
+		barsQ = $('#barsQ');
+		barsFreq = $('#barsFreq');
+		barsGain = $('#barsGain');
+		qDeg = 70;
+		gainDeg=180;
+		freqDeg=180.7;
+		setFreq=0;
+
+
+
+		
+
+		$('.abcd').click(function(e){
+			if (e.target.attributes['band'].value== 2) {
+				if (eqData.length > 0) {
+					$('div[band=2]').addClass('bandSelected');
+					$('div[band=1]').removeClass('bandSelected');
+					bandSelected = 2;
+					updateEQSettings(); 				
+				}
+			} else {
+				if (eqData.length > 0) {
+					$('div[band=1]').addClass('bandSelected');
+					$('div[band=2]').removeClass('bandSelected');
+					bandSelected = 1;
+					updateEQSettings(); 				
+				}
+			}
+		});
+
+
+
+		for(var i=0;i<colors.length;i++){
+
+			deg = i*12;
+
+			// Create the colorbars
+
+			$('<div class="colorBar">').css({
+				backgroundColor: '#'+colors[i],
+				transform:'rotate('+deg+'deg)',
+				top: -Math.sin(deg/rad2deg)*80+100,
+				left: Math.cos((180 - deg)/rad2deg)*80+100,
+			}).appendTo(barsQ);
+		}
+
+		for(var i=0;i<colorsFreq.length;i++){
+
+			deg = i*12;
+
+			// Create the colorbars
+
+			$('<div class="colorBar">').css({
+				backgroundColor: '#'+colorsFreq[i],
+				transform:'rotate('+deg+'deg)',
+				top: -Math.sin(deg/rad2deg)*80+100,
+				left: Math.cos((180 - deg)/rad2deg)*80+100,
+			}).appendTo(barsFreq);
+		}
+
+		for(var i=0;i<colorsGain.length;i++){
+
+			deg = i*12;
+
+			// Create the colorbars
+
+			$('<div class="colorBar">').css({
+				backgroundColor: '#'+colorsGain[i],
+				transform:'rotate('+deg+'deg)',
+				top: -Math.sin(deg/rad2deg)*80+100,
+				left: Math.cos((180 - deg)/rad2deg)*80+100,
+			}).appendTo(barsGain);
+		}
+
+			colorBarsQ = barsQ.find('.colorBar');
+			numBarsQ = 0, lastNumQ = -1;
+
+			colorBarsFreq = barsFreq.find('.colorBar');
+			numBarsFreq = 0, lastNumFreq = -1;
+
+			colorBarsGain = barsGain.find('.colorBar');
+			numBarsGain = 0, lastNumGain = -1;			
+
+		setQknob(qDeg);
+		setGainknob(gainDeg);
+		setFreqknob(freqDeg);
+		
+
+		$('#qText').change(this,function(){
+			var q=$('#qText').val();
+			qDeg = qToDeg(q);
+			console.log("qDeg in qtext change " + qDeg);
+			setQknob(qDeg);
+		});
+
+		$('#controlQ').doubletap(
+		    /** doubletap-dblclick callback */
+		    function(event){
+					setQknob(35);
+		    },
+		    /** touch-click callback (touch) */
+		    function(event){
+		    },
+		    /** doubletap-dblclick delay (default is 500 ms) */
+		    400
+			);
+			
+		$('#freqText').change(this,function(){
+			var freq=$('#freqText').val();
+
+			freqDeg = freqToDeg(freq);
+			setFreqknob(freqDeg);
+		});
+
+		$('#controlFreq').doubletap(
+		    /** doubletap-dblclick callback */
+		    function(event){
+					setFreqknob(180.7);
+		    },
+		    /** touch-click callback (touch) */
+		    function(event){
+		    },
+		    /** doubletap-dblclick delay (default is 500 ms) */
+		    400
+		);
+
+		$('#gainText').change(this,function(){
+			var k=$('#gainText').val();
+			gainDeg = gainToDeg(k);
+
+			setGainknob(gainDeg);
+		});
+
+		$('#controlGain').doubletap(
+		    /** doubletap-dblclick callback */
+		    function(event){
+					setGainknob(180);
+		    },
+		    /** touch-click callback (touch) */
+		    function(event){
+		    },
+		    /** doubletap-dblclick delay (default is 500 ms) */
+		    400
+		);
+	
+	
+		$('#type').change(this, function(){
+			var value = $('#type').val();
+			if(value != 2) {
+				$('#orderContainer').show();
+				$('#qContainer').hide();
+				$('#qContainer').val(1.0);
+				$('#topologyContainer').show();
+				$('#topology').val(eqData[bandSelected-1]['ftype']);
+				$('#topology').selectmenu('refresh');
+			} else if (value == 2) {
+				$('#orderContainer').hide();
+				$('#qContainer').show();
+				$('#qContainer').val(eqData[bandSelected-1]['q']);
+				setQknob(eqData[bandSelected-1]['q']);
+				$('#topologyContainer').hide();
+			}
+			
+		});
+		
+		$('#topology').change(this, function(){
+			var value = $('#topology').val();
+			var order = $('#order');
+			if(value != 2) {
+				order.find('option').remove();
+				order.append('<option value="1">1</option><option value="2">2</option');
+			} else if (value == 2) {
+				order.val("2");
+				order.selectmenu('refresh');
+				order.find('option[value=1]').remove();
+			}		
+		});
 	
 	////Put specs from API into page
 	//fire off XHR request with callback for updateEQSettings
 	var io = getCurrentIO() ? "o" : "i";
+	var eqURL = "a/" + io + "/" + getCurrentChannel() + "/eqparams.json";
 	var request = $.ajax({
 		type: 'GET',
-		url: "a/" + io + "/" + getCurrentChannel() + "/eqparams.json",
+		url: "spoof/eqparams.json",
   	dataType: 'json',
 		//cache: false,
-		success: function(data){ updateEQSettings(data); },
-		error: function(data) {alert('error')},
+		success: function(data){ 
+			eqData = data;
+			updateEQSettings(); 
+			},
+		error: function(data) {alert('error')}
 	});
 	
 });
@@ -828,6 +756,146 @@ $('#enableDisable').live('click',function(e) {
 //////////////////   FUNCTIONS!! //////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////
 
+function setQknob(qDeg){
+	$('#controlQ').empty();
+
+	$('#controlQ').knobKnob({
+		snap : 18,
+		value: qDeg,
+		turn : function(ratio){
+			numBarsQ = Math.round(colorBarsQ.length*ratio);
+
+			// Update the dom only when the number of active bars
+			// changes, instead of on every move
+			$('#qText').val(convertDegToQuality(ratio*359));
+			
+			if(numBarsQ == lastNumQ){
+				return false;
+			}
+			lastNumQ = numBarsQ;
+
+			colorBarsQ.removeClass('active').slice(0, numBarsQ).addClass('active');
+			colorBarsQ.slice(0,1).addClass('active');
+		}
+	});
+}
+
+function setFreqknob(freqDeg){	
+	$('#controlFreq').empty();
+
+	$('#controlFreq').knobKnob({
+		snap : 1,
+		value: freqDeg,
+		turn : function(ratio){
+			numBarsFreq = Math.round(colorBarsFreq.length*ratio);
+
+			// Update the dom only when the number of active bars
+			// changes, instead of on every move
+			if(setFreq==0){
+				$('#freqText').val(convertDegToFreq(ratio*359)+ " Hz");
+			}
+			setFreq=0;
+			
+			if(numBarsFreq == lastNumFreq){
+				return false;
+			}
+			lastNumFreq = numBarsFreq;
+			colorBarsFreq.removeClass('active').slice(0, numBarsFreq).addClass('active');
+		}
+	});
+}
+
+
+function setGainknob(gainDeg){
+	$('#controlGain').empty();
+
+	$('#controlGain').knobKnob({
+		snap : 1,
+		value: gainDeg,
+		turn : function(ratio){
+			numBarsGain = Math.round(colorBarsGain.length*ratio);
+
+			// Update the dom only when the number of active bars
+			// changes, instead of on every move
+			$('#gainText').val(convertDegToGain(ratio*359) + " dB");
+			
+			if(numBarsGain == lastNumGain){
+				return false;
+			}
+			lastNumGain = numBarsGain;
+
+
+			if(numBarsGain > 15) {
+					colorBarsGain.removeClass('active').slice(15, numBarsGain).addClass('active');
+			} else {
+					colorBarsGain.removeClass('active').slice(numBarsGain, 15).addClass('active');
+			}
+			colorBarsGain.slice(15,16).addClass('active');
+		}
+	});
+}
+
+
+function qToDeg(q) {
+	var value = 1;
+
+	if ( q<=.5 ) {
+		$('#qText').val(.5);
+		value = 20;
+	}
+	if ( q>10 ) {
+		$('#qText').val(10);
+		value = 359;
+	}
+	else {
+		value = q*35.9;
+	}
+	qDeg = value
+	return qDeg;
+}
+
+function freqToDeg(freq) {
+	setFreq=1;
+
+	if(freq < 54){
+		freq = 54;
+	}
+	if(freq > 20000){
+		freq = 20000;
+	}
+
+	$('#freqText').val(freq+" Hz");
+	freq = (Math.log(freq)/Math.log(10));
+	freqDeg=(freq-1.6989)/0.00725;
+	return freqDeg;
+}
+
+function gainToDeg(k) {
+	var gainDeg = 1;
+	if(k <= -15){
+		k=-15;
+		$('#gainText').val(-15);	
+		gainDeg = 1;
+	}
+	if(k >= 15){
+		k=15;
+		$('#gainText').val(15);
+		gainDeg = 359;
+	}
+
+	if(k < 0 && k > -15){
+		gainDeg= k*11.9667 +15*11.9667;
+	}
+	if(k >= 0 && k < 15){
+		gainDeg=k*11.9667+180;
+	}
+
+	return gainDeg;
+}
+
+
+
+
 function stripInactiveChannels(apiData) {
 	activeInputs = [];
 	for (i=0; i<numInputs; i++) {
@@ -929,16 +997,32 @@ function setCurrentChannelAndIO(channel,io) {
 	return true;
 }
 
-function updateEQSettings(eqSettings) {
-	for (i=0; i<4; i++) {
-		if ((eqSettings[i]['bandNum'] == 1) || (eqSettings[i]['bandNum'] == 4)) {
-			$('#type' + (i+1)).val(eqSettings[i]['type']);
-		}
-		$('[band="' + (i+1) + '"] .q').val(eqSettings[i]['q']);
-		$('[band="' + (i+1) + '"] .freq').val(eqSettings[i]['freq']);
-		$('[band="' + (i+1) + '"] .gain').val(eqSettings[i]['gain']);
-	}
-	setEnableDisableButton(eqSettings[0]['enable']);
+function updateEQSettings() {
+	var i = bandSelected;
+	$('#type').val(eqData[i-1]['type']);
+	$('#qText').val(eqData[i-1]['q']);
+	$('#freqText').val(eqData[i-1]['freq'] + " Hz");
+	$('#gainText').val(eqData[i-1]['gain'] + " dB");
+	$('#order').val(eqData[i-1]['order']);
+	$('#topology').val(eqData[i-1]['ftype']);
+	setEnableDisableButton(eqData[i-1]['enable']);
+	
+	$('#order').selectmenu('refresh');
+	$('#type').selectmenu('refresh');
+	$('#topology').selectmenu('refresh');
+			
+	qDeg = qToDeg(eqData[i-1]['q']);
+	setQknob(qDeg);
+	console.log("qdeg " + qDeg);
+	gainDeg = gainToDeg(eqData[i-1]['gain']);
+	setGainknob(gainDeg);
+	console.log("gaindeg " + gainDeg);
+	
+	freqDeg = freqToDeg(eqData[i-1]['freq']);
+	setFreqknob(freqDeg);
+	console.log("freqDeg " + freqDeg);
+	
+	$('#type').change();
 }
 
 function updateCompSettings(compSettings) {
@@ -1022,19 +1106,20 @@ function loadEQSettings() {
 }
 
 function writeEQSettings() {
-	var eqSettings = [];
-	for (i=0; i<4; i++) {
-		var temp = {};
-		if ((i == 0) || (i == 3)) {
-			temp['t'] = $('#type' + (i+1)).val();
-		} else temp['t'] = 1;
-		temp['q'] = $('[band="' + (i+1) + '"] .q').val();
-		temp['f'] = $('[band="' + (i+1) + '"] .freq').val();
-		temp['g'] = $('[band="' + (i+1) + '"] .gain').val();
-		temp['e'] = enable;
-		temp['b'] = i+1;
-		eqSettings.push(temp);
-	}	
+	var eqSettings = {};
+	var temp;
+ 	eqSettings['t'] = $('#type').val();
+	eqSettings['p'] = $('#topology').val();
+	eqSettings['o'] = $('#order').val();
+	eqSettings['q'] = $('#qText').val();
+	
+	temp = $('#freqText').val();
+	eqSettings['f'] = temp.substring(0, temp.length-3);
+	temp = $('#gainText').val();
+	eqSettings['g'] = temp.substring(0, temp.length-3);
+	eqSettings['e'] = enable;
+	eqSettings['b'] = bandSelected;
+
 	return eqSettings;
 }
 
@@ -1051,30 +1136,12 @@ function api_writeEQSettings() {
 	var io = getCurrentIO() ? "o" : "i";
 	var eqdata = writeEQSettings();
 	var api_url = "a/" + io + "/" + getCurrentChannel() + "/modeq";
-
+console.log(eqdata);
 	var request = $.ajax({
 		url: api_url,
-		data: eqdata[0],
+		data: eqdata,
 		success: function() {
-			$.ajax({
-				url: api_url,
-				data: eqdata[1],
-				success: function() {
-					$.ajax({
-						url: api_url,
-						data: eqdata[2],
-						success: function() {
-							$.ajax({
-								url: api_url,
-								data: eqdata[3],
-								success: function() {
-									console.log("sent EQ settings successfully!");
-								}
-							});
-						}
-					});
-				}
-			});
+			
 		}
 	});
 }

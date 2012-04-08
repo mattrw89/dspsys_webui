@@ -3,8 +3,7 @@
 		<link rel="stylesheet" href="css/styles.css" />
 		<link rel="stylesheet" href="css/jquery.css" />
 
-		<!--<script src="js/jquery.js"></script>-->
-		<script src="http://code.jquery.com/jquery-1.7.1.min.js"></script>
+		<script src="js/jquery.js"></script>
 		<script src="js/project.js"></script>
 		<meta name="viewport" content="width=default-width, initial-scale=1" />
 		
@@ -12,8 +11,8 @@
 		<!-- CSS stylesheets -->
     <link rel="stylesheet" href="assets/css/styles.css" />
     <link rel="stylesheet" href="assets/knobKnob/knobKnob.css" />
-		<script src="assets/knobKnob/transform.js"></script>
-		<script src="assets/knobKnob/knobKnob.jquery.js"></script>
+		<script src="assets/knobKnob/tf.js"></script>
+		<script src="assets/knobKnob/kk.js"></script>
 		
 	</head>
 	
@@ -30,18 +29,16 @@
 				<div class="instructionText">Modify equalization parameters</div>
 				
 				<div>  <!-- Container around button options -->
-					<a href="#" id="enableDisable" data-role="button">Enable</a>
-					
 					<div data-role="content">	
 						<div class="instructionText">Band Numbers</div>
 					
 					<div class="ui-grid-a"><!--LABELS! -->
-						<div class="ui-block-a"><div id="band" class="Bandcontainer abcd" band="1">1</div></div>
+						<div class="ui-block-a"><div id="band" class="Bandcontainer abcd bandSelected" band="1">1</div></div>
 						<div class="ui-block-b"><div id="band" class="Bandcontainer abcd" band="2">2</div></div>
-						</div>
-						<!--<div class="ui-block-c"><div id="band3" class="Bandcontainer" band="3">3</div></div>
-						<div class="ui-block-d"><div id="band4" class="Bandcontainer" band="4">4</div></div> -->
-						
+					</div>
+						<!--<div class="ui-block-c"><div id="band" class="Bandcontainer" band="3">3</div></div>
+						<div class="ui-block-d"><div id="band" class="Bandcontainer" band="4">4</div></div> -->
+						<a href="#" id="enableDisable" data-role="button">Enable</a>
 						<div class"bandSelected"></div>
 						
 					<div class="ui-grid-a"><!--  -->
@@ -54,29 +51,37 @@
 				   		</select>
 						</div>
 						
-						<div class="ui-block-a container2"><div class="bandLabel" >Topology</div></div>
-						<div class="ui-block-b" >
-							<select name="topology" id="topology">
-				      	<option value="0">Bessel</option>
-				      	<option value="1">Butterworth</option>
-				      	<option value="2">Linkwitz-Riley</option>
-				   		</select>
+						<div id="topologyContainer">
+							<div class="ui-block-a container2">
+								<div class="bandLabel" >Topology</div>
+							</div>
+							<div class="ui-block-b" >
+								<select name="topology" id="topology">
+					      	<option value="0">Bessel</option>
+					      	<option value="1">Butterworth</option>
+					      	<option value="2">Linkwitz-Riley</option>
+					   		</select>
+							</div>
 						</div>
 						
-						<div class="ui-block-a container2"><div class="bandLabel">Filter Order</div></div>
+						<div id="orderContainer">
+							<div class="ui-block-a container2">
+								<div class="bandLabel">Filter Order</div>
+							</div>
 						
-						<div class="ui-block-b">
-							<select name="order" id="order">
-				      	<option value="1">1</option>
-				      	<option value="2">2</option>
-				      	<option value="3">3</option>
-				      	<option value="4">4</option>
-				   		</select>
+							<div class="ui-block-b">
+								<select name="order" id="order">
+					      	<option value="1">1</option>
+					      	<option value="2">2</option>
+					      	<!--<option value="3">3</option>
+					      	<option value="4">4</option>-->
+					   		</select>
+							</div>
 						</div>
 					</div>
 					
-			<!--Start of the second portion of the UI, Quality, Cut off Frequency, and Gain-->	
-						<div class="container" >
+			<!--Start of the second portion of the UI, Quality, Cutoff Frequency, and Gain-->	
+						<div class="container" id="qContainer">
 							<div class="upper">Quality</div>
 							<div class="lower">
 								<input type="text" id="qText" name="q" class="inputText" style='width:125px' value="2.0" onclick="this.value='';" />
