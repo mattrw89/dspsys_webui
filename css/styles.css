@@ -1,6 +1,6 @@
 .instructionText {
 	text-align:center; 
-	font-size:16px; 
+	font-size:20px; 
 	font-family:'Helvetica Neue';
 	font-weight:bold;
 }
@@ -23,11 +23,12 @@
 
 .bandLabel {
 	margin-top:14px;
-	margin-bottom:14px;
-	text-align:center;
+	margin-bottom:14;
+	text-align:left;
 	font-size:18px;
 	font-family:'Helvetica Neue';	
 	font-weight:bold;
+	width:50%;
 }
 
 input[type='text'],input[type='number'],textarea,select {font-size:16px;}
@@ -35,22 +36,57 @@ input[type='text'],input[type='number'],textarea,select {font-size:16px;}
 
 .upper {
 	position: relative;
-	height: 60px;
+	height: 20px;
 	padding:0px 0px 5px 0px;
-	border:5px solid gray;
+	border-bottom:3px solid black;
 }
 
 .lower {
 	position: relative;
-	height:60px;
+	height:30px;
+	border:0px solid black;
+	margin-top:10px;
 	
 }
 
+.Bandcontainer {
+	width:120px;
+	border:2px solid black;
+	border-size:20px;
+	margin:0px auto;
+	text-align:center;
+	margin-top:14px;
+	margin-bottom:14;
+	font-size:20px;
+	font-family:'Helvetica Neue';	
+	font-weight:bold;
+}
+
 .container {
-	width:300px;
+	width:250px;
+	border:2px solid black;
+	border-size:20px;
+	margin:0px auto;
+	text-align:center;
+	margin-top:14px;
+	margin-bottom:0px;
+	font-size:18px;
+	font-family:'Helvetica Neue';	
+	font-weight:bold;
+}
+
+.container2 {
+	text-align:left;
 }
 
 .inputText {
-	width:100px;
+	text-align:center;
+	margin:0px auto;
+	
+}
+
+.bandSelected {
+	background-color:#BAC2D4;
+	border-width:5px;
 	
 }

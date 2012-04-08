@@ -68,8 +68,6 @@ $(function(){
 	];
 	
 	var colorsGain = [
-	
-	
 	'bf0000','c31212','c82424','cc3636','d14848','d65b5b',
 	'da6d6d','df7f7f','e39191','e8a3a3','ecb6b6','f1c8c8',
 	'f5dada','faecec','ffffff','ffffff','ececfa','dadaf5',
@@ -79,7 +77,6 @@ $(function(){
 	];
 	
 	var colorsFreq = [
-	//'1c00e2','2200dc','2800d6','2e00d0','3400ca',
 	'3900c5','3f00bf','4500b9','4b00b3','5100ad',
 	'5600a8','5c00a2','62009c','680096','6e0090',
 	'73008b','790085','7f007f','850079','8b0073',
@@ -87,11 +84,7 @@ $(function(){
 	'ad0051','b3004b','b90045','bf003f','c50039',
 	'ad0051','b3004b','b90045','bf003f','c50039'
 	];
-	/*
-	'ad0051','b3004b','b90045','bf003f','c50039',
-	'ca0034','d0002e','d60028','dc0022','e2001c',
-	'e70017','ed0011','f3000b','f90005','ff0000'
-	*/
+
 	
 	var rad2deg = 180/Math.PI;
 	var deg = 0;
@@ -102,6 +95,28 @@ $(function(){
 	var gainDeg=180;
 	var freqDeg=180.7;
 	var setFreq=0;
+	
+	var bandSelected = 1;
+	
+	
+	$('.abcd').click(function(e){
+	//	console.log(e);
+		var clicked = e.target.attributes['band'];
+		//console.log(clicked.value);
+		//alert("stop poking me! ");
+		if (clicked.value== 2) {
+			$('div[band=2]').addClass('bandSelected');
+			$('div[band=1]').removeClass('bandSelected');
+			bandSelected = 2;
+		} else {
+			$('div[band=1]').addClass('bandSelected');
+			$('div[band=2]').removeClass('bandSelected');
+			bandSelected = 1;
+		}
+		
+	});
+	
+	
 	
 	for(var i=0;i<colors.length;i++){
 		
@@ -232,7 +247,7 @@ function setFreqknob(freqDeg){
 			}
 			lastNumFreq = numBarsFreq;
 			if(setFreq==0){
-				$('#freqText').val(convertDegToFreq(ratio*359));
+				$('#freqText').val(convertDegToFreq(ratio*359)+ " Hz");
 			}
 			setFreq=0;
 			colorBarsFreq.removeClass('active').slice(0, numBarsFreq).addClass('active');
@@ -254,7 +269,7 @@ function setFreqknob(freqDeg){
 			freq=20000;
 		}
 		
-		$('#freqText').val(freq)
+		$('#freqText').val(freq+" Hz");
 		
 		//console.log("Got"+freq);
 		
@@ -299,7 +314,7 @@ function setGainknob(gainDeg){
 				return false;
 			}
 			lastNumGain = numBarsGain;
-			$('#gainText').val(convertDegToGain(ratio*359));
+			$('#gainText').val(convertDegToGain(ratio*359) + " dB");
 			//console.log("turn" + convertDegToGain(ratio*359));
 			
 			if(numBarsGain > 15) {

@@ -27,7 +27,7 @@
 			</div><!--  header -->
 
 			<div data-role="content">	
-				<div class="instructionText">Modify equalization parameters.</div>
+				<div class="instructionText">Modify equalization parameters</div>
 				
 				<div>  <!-- Container around button options -->
 					<a href="#" id="enableDisable" data-role="button">Enable</a>
@@ -36,35 +36,37 @@
 						<div class="instructionText">Band Numbers</div>
 					
 					<div class="ui-grid-a"><!--LABELS! -->
-						<div class="ui-block-a"><div class="bandLabel" band="1">1</div></div>
-						<div class="ui-block-b"><div class="bandLabel" band="2">2</div></div>
+						<div class="ui-block-a"><div id="band" class="Bandcontainer abcd" band="1">1</div></div>
+						<div class="ui-block-b"><div id="band" class="Bandcontainer abcd" band="2">2</div></div>
 						</div>
-						<!--<div class="ui-block-c"><div class="bandLabel" band="3">3</div></div>
-						<div class="ui-block-d"><div class="bandLabel" band="4">4</div></div> -->
+						<!--<div class="ui-block-c"><div id="band3" class="Bandcontainer" band="3">3</div></div>
+						<div class="ui-block-d"><div id="band4" class="Bandcontainer" band="4">4</div></div> -->
+						
+						<div class"bandSelected"></div>
 						
 					<div class="ui-grid-a"><!--  -->
-						<div class="ui-block-a"><div class="bandLabel">Type</div></div>
+						<div class="ui-block-a container2"><div class="bandLabel">Type</div></div>
 						<div class="ui-block-b">
-							<select name="type" id="type1">
+							<select name="type" id="type">
 				      	<option value="0">LPF</option>
 				      	<option value="1">HPF</option>
 				      	<option value="2">Parametric</option>
 				   		</select>
 						</div>
 						
-						<div class="ui-block-a"><div class="bandLabel">Topology</div></div>
-						<div class="ui-block-b">
-							<select name="t2" id="type1">
+						<div class="ui-block-a container2"><div class="bandLabel" >Topology</div></div>
+						<div class="ui-block-b" >
+							<select name="topology" id="topology">
 				      	<option value="0">Bessel</option>
 				      	<option value="1">Butterworth</option>
 				      	<option value="2">Linkwitz-Riley</option>
 				   		</select>
 						</div>
 						
-						<div class="ui-block-a"><div class="bandLabel">Filter Order</div></div>
+						<div class="ui-block-a container2"><div class="bandLabel">Filter Order</div></div>
 						
 						<div class="ui-block-b">
-							<select name="t3" id="type1">
+							<select name="order" id="order">
 				      	<option value="1">1</option>
 				      	<option value="2">2</option>
 				      	<option value="3">3</option>
@@ -73,55 +75,41 @@
 						</div>
 					</div>
 					
-				<div class ="ui-grid-a">
-						
-						<div class="ui-block-a container">
-							<div class="upper bandLabel">Quality</div>
+			<!--Start of the second portion of the UI, Quality, Cut off Frequency, and Gain-->	
+						<div class="container" >
+							<div class="upper">Quality</div>
 							<div class="lower">
-								<input type="text" id="qText" name="q" class="q inputText" value="2.0"  />
+								<input type="text" id="qText" name="q" class="inputText" style='width:125px' value="2.0" onclick="this.value='';" />
 							</div>
-						</div>
-							
-						
 							<!-- Shiny knob-->
-						<div class="ui-block-a">
 							<div id="barsQ" field="q" style="-moz-transform: rotate(-90deg);-webkit-transform:rotate(-90deg);">
 								<div id="controlQ" field="q"></div>
 							</div>
 						</div>
-							
 						
-						<div class="ui-block-a container">
-							<div class="upper bandLabel">Frequency</div>
+						<div class="container">
+							<div class="upper">Frequency</div>
 							<div class="lower">
-								<input type="text" name="f" id="freqText" class="freq inputText" value="1000.0" />
-							</div>
-						</div>
-						
-						<!-- Shiny knob-->
-						<div class="ui-block-a">
+								<input type="text" name="f" id="freqText" class="inputText" style='width:125px' value="1000.0" onclick="this.value='';"/>
+							</div>	
+							<!-- Shiny knob-->
 							<div id="barsFreq" field="freq" style="-moz-transform: rotate(-90deg);-webkit-transform:rotate(-90deg);">
 								<div id="controlFreq" field="freq"></div>
 							</div>
 						</div>
 					
-						<div class="ui-block-a container">
-							<div class="bandLabel">Gain</div>
+						<div class="container">
+							<div class="upper">Gain</div>
 							<div class="lower">
-								<input type="text" name="g" id="gainText" class="gain inputText" value="0.0" />
+								<input type="text" name="g" id="gainText" class="inputText" style='width:125px' value="0.0" onclick="this.value='';"/>
+							</div>
+							<!-- Shiny knob-->
+							<div id="barsGain" field="gain" style="-moz-transform: rotate(-90deg);-webkit-transform:rotate(-90deg);">
+								<div id="controlGain" field="gain"></div>			
 							</div>
 						</div>
-						
-						
-						<!-- Shiny knob-->
-					<div class="ui-block-a">
-							<div id="barsGain" field="gain" style="-moz-transform: rotate(-90deg);-webkit-transform:rotate(-90deg);">
-								<div id="controlGain" field="gain"></div>
-							</div>
-					</div>	
 					
 					</div>
-					
 					<a href="#" id="eqApply" data-role="button">Apply</a></div>
 					
 			</div><!-- /content -->
