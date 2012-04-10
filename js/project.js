@@ -2,8 +2,8 @@
 var numOutputs = 2;
 var numInputs = 2;
 var api_endpoints = {};
-api_endpoints["chanlist_input"] = "a/i/chanlist.json";// "spoof/chanlist_input.json";
-api_endpoints["chanlist_output"] = "spoof/chanlist_output.json";//"a/o/chanlist.json"; //"spoof/chanlist_output.json";  
+api_endpoints["chanlist_input"] = "a/i/chanlist.json"; // "spoof/chanlist_input.json";
+api_endpoints["chanlist_output"] = "a/o/chanlist.json"; //"spoof/chanlist_output.json";// //"spoof/chanlist_output.json";  
 var globalInputChannels = null;
 var globalOutputChannels = null;
 var labels_changed = [];
@@ -218,7 +218,8 @@ $('#processOutputsPage').live('pagebeforecreate', function(e) {
 	});
 	
 	for(i=0; i < numOutputs; i++) {
-		$('#fillOutputButtons').append("<a href='#' data-role='button' class='output' channel='0'></a>");
+	//	<a href="#" class="procType" id="eqLink" function="eq" data-role="button">Equalization</a>
+		$('#fillOutputButtons').append("<a href='#' data-role='button' class='output' channel='0' function='eq' id='eqLink'></a>");
 		$('#fillOutputButtons').hide();
 	}
 	changeTopTitle('Process Outputs');
@@ -228,7 +229,7 @@ $('.output').live('click',function(e) {
 	e.stopImmediatePropagation();
 	e.preventDefault();
 	setCurrentChannelAndIO($(this).attr('channel'), 1)
-	$.mobile.changePage("output.htm");
+	$.mobile.changePage("eq.htm");
 	return false;
 });
 
@@ -271,7 +272,7 @@ $('.procType').live('click',function(e) {
 //////  EQ Settings Page -- eq.htm ////////////
 $("#eqPage").live('pagebeforeshow',function(event) {
 	enable = null; // reset the enable/disable status
-	setEnableDisableButton();
+	//setEnableDisableButton();
 
 	if( getCurrentIO() == 1) {
 		$('.eqTitle').text('EQ Output ' + getActiveOutputName(getCurrentChannel()));
@@ -321,23 +322,45 @@ $("#eqPage").live('pagebeforeshow',function(event) {
 		setFreq=0;
 
 
-
-		
-
 		$('.abcd').click(function(e){
+			var io = getCurrentIO() ? "o" : "i";
+			var eqURL = "a/" + io + "/" + getCurrentChannel() + "/eqparams.json";
+			var request = 0;
 			if (e.target.attributes['band'].value== 2) {
 				if (eqData.length > 0) {
 					$('div[band=2]').addClass('bandSelected');
 					$('div[band=1]').removeClass('bandSelected');
 					bandSelected = 2;
-					updateEQSettings(); 				
+
+					request = $.ajax({
+						type: 'GET',
+						url: eqURL,
+				  	dataType: 'json',
+						//cache: false,
+						success: function(data) { 
+							eqData = data;
+							updateEQSettings();
+							},
+						error: function(data) {alert('error')}
+					});			
 				}
 			} else {
 				if (eqData.length > 0) {
 					$('div[band=1]').addClass('bandSelected');
 					$('div[band=2]').removeClass('bandSelected');
 					bandSelected = 1;
-					updateEQSettings(); 				
+
+					request = $.ajax({
+						type: 'GET',
+						url: eqURL,
+				  	dataType: 'json',
+						//cache: false,
+						success: function(data) { 
+							eqData = data;
+							updateEQSettings();
+							},
+						error: function(data) {alert('error')}
+					});			
 				}
 			}
 		});
@@ -394,7 +417,7 @@ $("#eqPage").live('pagebeforeshow',function(event) {
 
 			colorBarsGain = barsGain.find('.colorBar');
 			numBarsGain = 0, lastNumGain = -1;			
-
+		console.log("before initial set?" + qDeg);
 		setQknob(qDeg);
 		setGainknob(gainDeg);
 		setFreqknob(freqDeg);
@@ -410,7 +433,7 @@ $("#eqPage").live('pagebeforeshow',function(event) {
 		$('#controlQ').doubletap(
 		    /** doubletap-dblclick callback */
 		    function(event){
-					setQknob(35);
+					setQknob(70);
 		    },
 		    /** touch-click callback (touch) */
 		    function(event){
@@ -460,8 +483,14 @@ $("#eqPage").live('pagebeforeshow',function(event) {
 	
 		$('#type').change(this, function(){
 			var value = $('#type').val();
+			var data = {'t':value, 'b':bandSelected};
+			api_writeEQSettings(data);
+			
+			
 			if(value != 2) {
 				$('#orderContainer').show();
+				$('#order').val(eqData[bandSelected-1]['order']);
+				$('#order').selectmenu('refresh');
 				$('#qContainer').hide();
 				$('#qContainer').val(1.0);
 				$('#topologyContainer').show();
@@ -470,8 +499,9 @@ $("#eqPage").live('pagebeforeshow',function(event) {
 			} else if (value == 2) {
 				$('#orderContainer').hide();
 				$('#qContainer').show();
-				$('#qContainer').val(eqData[bandSelected-1]['q']);
-				setQknob(eqData[bandSelected-1]['q']);
+				$('#qText').val(eqData[bandSelected-1]['q']);
+				qDeg = qToDeg(eqData[bandSelected-1]['q']);
+				setQknob(qDeg);
 				$('#topologyContainer').hide();
 			}
 			
@@ -479,15 +509,15 @@ $("#eqPage").live('pagebeforeshow',function(event) {
 		
 		$('#topology').change(this, function(){
 			var value = $('#topology').val();
-			var order = $('#order');
-			if(value != 2) {
-				order.find('option').remove();
-				order.append('<option value="1">1</option><option value="2">2</option');
-			} else if (value == 2) {
-				order.val("2");
-				order.selectmenu('refresh');
-				order.find('option[value=1]').remove();
-			}		
+			var data = {'p':value, 'b':bandSelected};
+			api_writeEQSettings(data);
+		});
+		
+		
+		$('#order').change(this, function(){
+			var value = $('#order').val();
+			var data = {'o':value, 'b':bandSelected};
+			api_writeEQSettings(data);
 		});
 	
 	////Put specs from API into page
@@ -496,12 +526,12 @@ $("#eqPage").live('pagebeforeshow',function(event) {
 	var eqURL = "a/" + io + "/" + getCurrentChannel() + "/eqparams.json";
 	var request = $.ajax({
 		type: 'GET',
-		url: "spoof/eqparams.json",
+		url: eqURL,
   	dataType: 'json',
 		//cache: false,
-		success: function(data){ 
+		success: function(data) { 
 			eqData = data;
-			updateEQSettings(); 
+			updateEQSettings();
 			},
 		error: function(data) {alert('error')}
 	});
@@ -513,9 +543,9 @@ $('.backLinkFuncs').live('click',function(e) {
 	e.preventDefault();
 	
 	if(getCurrentIO() == 1) {
-		$.mobile.changePage("output.htm", {reverse: true});		
+		$.mobile.changePage("proco.htm", {reverse: true});		
 	} else if (getCurrentIO() == 0){
-		$.mobile.changePage("input.htm", {reverse: true});
+		$.mobile.changePage("proci.htm", {reverse: true});
 	} else $.mobile.changePage('index.htm', {reverse: true});
 	return false;
 });
@@ -525,7 +555,7 @@ $('#eqApply').live('click',function(e) {
 	e.stopImmediatePropagation();
 	e.preventDefault();
 	
-	api_writeEQSettings();
+	api_writeEQSettings(writeEQSettings());
 	
 	//run some function to update the values in the MCU
 	return false;
@@ -741,12 +771,12 @@ $('#enableDisable').live('click',function(e) {
 	e.stopImmediatePropagation();
 	e.preventDefault();
 	setEnableDisableButton();
-	console.log("enable");
-	console.log(enable);
+
+	var data = {'e':enable, 'b':bandSelected};
 	
 	if( $('#compApply').exists() ) {
 		api_writeCompSettings();
-	} else if ( $('#eqApply').exists() ) api_writeEQSettings();
+	} else if ( $('#eqApply').exists() ) 	api_writeEQSettings(data);
 
 	return false;
 });
@@ -764,15 +794,18 @@ function setQknob(qDeg){
 		value: qDeg,
 		turn : function(ratio){
 			numBarsQ = Math.round(colorBarsQ.length*ratio);
+			var value = convertDegToQuality(ratio*359);
 
 			// Update the dom only when the number of active bars
 			// changes, instead of on every move
-			$('#qText').val(convertDegToQuality(ratio*359));
+			$('#qText').val(value);
 			
 			if(numBarsQ == lastNumQ){
 				return false;
 			}
 			lastNumQ = numBarsQ;
+			var data = {'q':value,'b':bandSelected};
+			api_writeEQSettings(data);
 
 			colorBarsQ.removeClass('active').slice(0, numBarsQ).addClass('active');
 			colorBarsQ.slice(0,1).addClass('active');
@@ -788,11 +821,12 @@ function setFreqknob(freqDeg){
 		value: freqDeg,
 		turn : function(ratio){
 			numBarsFreq = Math.round(colorBarsFreq.length*ratio);
+			var value = convertDegToFreq(ratio*359);
 
 			// Update the dom only when the number of active bars
 			// changes, instead of on every move
 			if(setFreq==0){
-				$('#freqText').val(convertDegToFreq(ratio*359)+ " Hz");
+				$('#freqText').val(value + " Hz");
 			}
 			setFreq=0;
 			
@@ -800,6 +834,9 @@ function setFreqknob(freqDeg){
 				return false;
 			}
 			lastNumFreq = numBarsFreq;
+			var data = {'f':value, 'b':bandSelected};
+			api_writeEQSettings(data);
+			
 			colorBarsFreq.removeClass('active').slice(0, numBarsFreq).addClass('active');
 		}
 	});
@@ -814,10 +851,10 @@ function setGainknob(gainDeg){
 		value: gainDeg,
 		turn : function(ratio){
 			numBarsGain = Math.round(colorBarsGain.length*ratio);
-
+			var value = convertDegToGain(ratio*359);
 			// Update the dom only when the number of active bars
 			// changes, instead of on every move
-			$('#gainText').val(convertDegToGain(ratio*359) + " dB");
+			$('#gainText').val(value + " dB");
 			
 			if(numBarsGain == lastNumGain){
 				return false;
@@ -826,10 +863,16 @@ function setGainknob(gainDeg){
 
 
 			if(numBarsGain > 15) {
+
+				
 					colorBarsGain.removeClass('active').slice(15, numBarsGain).addClass('active');
 			} else {
 					colorBarsGain.removeClass('active').slice(numBarsGain, 15).addClass('active');
 			}
+			
+			var data = {'g':value, 'b':bandSelected};
+			api_writeEQSettings(data);
+			
 			colorBarsGain.slice(15,16).addClass('active');
 		}
 	});
@@ -919,7 +962,10 @@ function loadInputNameArray() {
 //  sets the Enable/Disable button on a page
 //    if enable is null then it places the value from the parameter
 function setEnableDisableButton(data) {
-	if (enable == null) {
+	if (data != null) {
+		if (data == 1) {
+			data = 0;
+		} else data = 1;
 		enable = data;
 	}
 	if(enable == 0) {
@@ -1013,16 +1059,32 @@ function updateEQSettings() {
 			
 	qDeg = qToDeg(eqData[i-1]['q']);
 	setQknob(qDeg);
-	console.log("qdeg " + qDeg);
+
 	gainDeg = gainToDeg(eqData[i-1]['gain']);
 	setGainknob(gainDeg);
-	console.log("gaindeg " + gainDeg);
+
 	
 	freqDeg = freqToDeg(eqData[i-1]['freq']);
 	setFreqknob(freqDeg);
-	console.log("freqDeg " + freqDeg);
-	
-	$('#type').change();
+
+	var value = eqData[i-1]['type'];
+	console.log(value);
+		if(value != 2) {
+			$('#orderContainer').show();
+			$('#order').val(eqData[bandSelected-1]['order']);
+			$('#order').selectmenu('refresh');
+			$('#qContainer').hide();
+			$('#qContainer').val(1.0);
+			$('#topologyContainer').show();
+			$('#topology').val(eqData[bandSelected-1]['ftype']);
+			$('#topology').selectmenu('refresh');
+		} else if (value == 2) {
+			$('#orderContainer').hide();
+			$('#qContainer').show();
+			$('#qText').val(eqData[bandSelected-1]['q']);
+			setQknob(qDeg);
+			$('#topologyContainer').hide();
+		}
 }
 
 function updateCompSettings(compSettings) {
@@ -1132,11 +1194,11 @@ function writeCompSettings() {
 
 
 //write eq settings to Stellaris
-function api_writeEQSettings() {
+function api_writeEQSettings(eqdata) {
 	var io = getCurrentIO() ? "o" : "i";
-	var eqdata = writeEQSettings();
+
 	var api_url = "a/" + io + "/" + getCurrentChannel() + "/modeq";
-console.log(eqdata);
+
 	var request = $.ajax({
 		url: api_url,
 		data: eqdata,
